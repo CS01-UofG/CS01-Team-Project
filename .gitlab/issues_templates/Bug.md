@@ -1,5 +1,5 @@
 ### Checklist before submitting Bug Issue
-- [x] I am running the latest version of software
+- [ ] I am running the latest version of software
 - [ ] I am using updated packages
 - [ ] This issue hasn't been submitted already
 
