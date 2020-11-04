@@ -4,12 +4,16 @@
   "description": "Application for Team Project CS01, Proposed by Thales. ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "electron ."
   },
   "repository": {
     "type": "git",
     "url": "https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-main.git"
   },
   "author": "CS01",
-  "license": "SEE LICENSE IN LICENSE ON GITLAB REPO"
+  "license": "SEE LICENSE IN LICENSE ON GITLAB REPO",
+  "devDependencies": {
+    "cesium": "^1.75.0",
+    "electron": "10.1.5"
+  }
 }
