@@ -2,7 +2,7 @@
   "name": "electronjsapp",
   "version": "1.0.0",
   "description": "Application for Team Project CS01, Proposed by Thales. ",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "electron ."
   },
@@ -14,6 +14,8 @@
   "license": "SEE LICENSE IN LICENSE ON GITLAB REPO",
   "devDependencies": {
     "cesium": "^1.75.0",
-    "electron": "10.1.5"
+    "electron": "10.1.5",
+    "jquery": "^3.3.1",
+    "bootstrap": "^4.1.3",
   }
 }
