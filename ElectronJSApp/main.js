@@ -1,15 +1,15 @@
 const { app, BrowserWindow } = require('electron')
 
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
     // Disables window headers
     frame: false,
     // Disables dev tools 
-    webPreferences: {
-      devTools: false
-      }
+    // webPreferences: {
+    //   devTools: false
+    //   }
   })
 
   win.loadFile('index.html')
