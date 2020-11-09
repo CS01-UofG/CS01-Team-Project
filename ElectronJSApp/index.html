@@ -8,9 +8,9 @@
         <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
         <script>let $ = require('jquery');</script>
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="./contents/bootstrap/4.1.3/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
         <!-- Personal CSS -->
-        <link rel="stylesheet" href="./assets/style.css" />
+        <link rel="stylesheet" type="text/css" href="./assets/style.css">
         <!-- Bootstrap Optional JavaScript -->
         <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
         <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
@@ -18,12 +18,21 @@
         <style>
             @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
             html, body, #cesiumContainer {
-                height: 100%; margin: 0; padding: 0; overflow: hidden;
+                height: 99%;width: auto; margin: 0; padding: 10px; overflow: none;
             }
+            body{
+                background-color: black;
+            }
+
         </style>
+
+        
     </head>
     <body>
+
+        <p style="color: white;">Longitude : <a style="color: white;" id="longitude"></a> Latitude : <a style="color: white;"    id="latitude"></a></p>
         <div id="cesiumContainer"></div>
+
         <script src="./main-viewer.js"></script>
     </body>
 </html>
