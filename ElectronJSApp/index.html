@@ -1,38 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-        <title>ThalesJS</title>
-        <!-- Add all dependancy here  -->
-        <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
-        <script>let $ = require('jquery');</script>
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
-        <!-- Personal CSS -->
-        <link rel="stylesheet" type="text/css" href="./assets/style.css">
-        <!-- Bootstrap Optional JavaScript -->
-        <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
-        <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
-        <script>require('bootstrap');</script>
-        <style>
-            @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
-            html, body, #cesiumContainer {
-                height: 99%;width: auto; margin: 0; padding: 10px; overflow: none;
-            }
-            body{
-                background-color: black;
-            }
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>ThalesJS</title>
+    <!-- Add all dependancy here  -->
+    <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
+    <script>
+      let $ = require("jquery");
+    </script>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <!-- Personal CSS -->
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    <!-- Bootstrap Optional JavaScript -->
+    <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <script>
+      require("bootstrap");
+    </script>
+    <style>
+      @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        height: 99%;
+        width: auto;
+        margin: 0;
+        padding: 10px;
+        overflow: none;
+      }
+      body {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="dropdown col-4">
+        <button
+          class="btn btn-secondary dropdown-toggle"
+          type="button"
+          id="dropdownMenu2"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Task
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+          <button
+            class="dropdown-item"
+            type="button"
+            onclick="changeTask(tasks.TASK1)"
+          >
+            Task 1
+          </button>
+          <button
+            class="dropdown-item"
+            type="button"
+            onclick="changeTask(tasks.TASK2)"
+          >
+            Task 2
+          </button>
+        </div>
+      </div>
+      <p class="col-8" style="color: white">
+        Longitude : <a style="color: white" id="longitude"></a> Latitude :
+        <a style="color: white" id="latitude"></a>
+      </p>
+    </div>
+    <div id="cesiumContainer"></div>
 
-        </style>
-
-        
-    </head>
-    <body>
-
-        <p style="color: white;">Longitude : <a style="color: white;" id="longitude"></a> Latitude : <a style="color: white;"    id="latitude"></a></p>
-        <div id="cesiumContainer"></div>
-
-        <script src="./main-viewer.js"></script>
-    </body>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./js/constants.js"></script>
+    <script src="./js/task-1.js"></script>
+    <script src="./js/task-2.js"></script>
+    <script src="./js/main-viewer.js"></script>
+  </body>
 </html>
