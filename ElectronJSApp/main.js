@@ -27,7 +27,8 @@ function createWindow() {
     frame: true,
     // Disables dev tools
     webPreferences: {
-      devTools: false,
+      devTools: true,
+      nodeIntegration: true
     },
   });
 

@@ -9,9 +9,6 @@
     <title>ThalesJS</title>
     <!-- Add all dependancy here  -->
     <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
-    <script>
-      let $ = require("jquery");
-    </script>
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -19,13 +16,7 @@
     />
     <!-- Personal CSS -->
     <link rel="stylesheet" type="text/css" href="./css/style.css" />
-    <!-- Bootstrap Optional JavaScript -->
-    <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
-    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
-    <script>
-      require("bootstrap");
-    </script>
-    <style>
+     <style>
       @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
       html,
       body,
@@ -78,24 +69,18 @@
     </div>
     <div id="cesiumContainer"></div>
 
-    <script
-      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-      crossorigin="anonymous"
-    ></script>
     <script src="./js/constants.js"></script>
     <script src="./js/task-1.js"></script>
     <script src="./js/task-2.js"></script>
     <script src="./js/main-viewer.js"></script>
+
+  <!-- Bootstrap Optional JavaScript -->
+  <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
+  <script>
+    window.jQuery = window.$ = require('jquery');
+   </script>
+  <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+  <script src="./node_modules/bootstrap-input-spinner/src/InputSpinner.js"></script>
+
   </body>
 </html>
