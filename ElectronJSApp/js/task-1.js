@@ -1,26 +1,5 @@
 function setupTask1() {
-  // in the future this will be received from the sensor
-  // currently hard coded
-  // Glasgow Uni 55.873543, 	-4.289058
   viewer.scene.mode = Cesium.SceneMode.SCENE2D;
-
-  var sensorLong = -4.289058;
-  var sensorLat = 55.873543;
-
-  // Show user Long and lat
-  document.getElementById("longitude").innerHTML = sensorLong;
-  document.getElementById("latitude").innerHTML = sensorLat;
-
-  viewer.scene.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(
-      sensorLong,
-      sensorLat,
-      40000000.0
-    ),
-    orientation: {
-      heading: Cesium.Math.toRadians(0),
-    },
-  });
 
   // distance between object of interest and the sensor in meters
   var objectDistanceFromSensor = 140.0;
@@ -28,9 +7,6 @@ function setupTask1() {
   // not sure about the name, this is just how wide the field of view is
   var sensorVisionAngle = 30.0;
   var sensorMaxVisibility = 160.0;
-
-  // converting sensor from degrees to cartesian coordinates i.e. (x, y, z)
-  var sensorCartesian = Cesium.Cartesian3.fromDegrees(sensorLong, sensorLat);
 
   var user = viewer.entities.add({
     name: "user",
