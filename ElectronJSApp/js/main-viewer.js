@@ -1,3 +1,7 @@
+const { ipcRenderer } = require('electron');
+/** Define channel name */
+const CHANNEL_NAME = 'main';
+
 function changeTask(s) {
   switch (s) {
     case tasks.TASK1:
@@ -29,6 +33,7 @@ viewer.scene.globe.depthTestAgainstTerrain = true;
 // var sensorLong = -4.289058;
 // var sensorLat = 55.873543;
 
+
 // mountains north of Glasgow, we have steep slopes so we can properly see the intersection
 // with the earth surface
 var sensorLong = -3.72;
@@ -37,6 +42,13 @@ var sensorLat = 57.06;
 // Show user Long and lat
 document.getElementById("longitude").innerHTML = sensorLong;
 document.getElementById("latitude").innerHTML = sensorLat;
+
+
+/** Add IPC event listener which enables user to add points */
+ipcRenderer.on(CHANNEL_NAME, (event, data) => {
+  console.log(data);
+  addPoint(data);
+});
 
 // converting sensor from degrees to cartesian coordinates i.e. (x, y, z)
 var sensorCartesian = Cesium.Cartesian3.fromDegrees(

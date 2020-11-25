@@ -1,6 +1,9 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const WebSocket = require('ws');
 const express = require('express');
+
+let win;
+const CHANNEL_NAME = 'main';
 
 // Create Websocket - Inspiration https://github.com/mafikes/electron-websocket-express
 const Config = {
@@ -20,9 +23,10 @@ const wss = new WebSocket.Server({port: Config.socket_port});
 
 // Create Electron Window
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 1000,
+  
+  win = new BrowserWindow({
+    width: 1920,
+    height: 1080,
     // Disables window headers
     frame: true,
     // Disables dev tools
@@ -32,11 +36,21 @@ function createWindow() {
     },
   });
 
-  win.loadFile("index.html");
+  /** Open devTools */
   win.webContents.openDevTools();
+
+  /** Load the index.html page */
+  win.loadFile('index.html');
+
 }
 
-app.whenReady().then(createWindow);
+const init = () => {
+  /** Create app window */
+  createWindow();
+  // Can use this place to initialize other things :) 
+};
+
+app.on('ready', init);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -50,7 +64,6 @@ app.on("activate", () => {
   }
 })
 
-// More Websockets Stuff 
 /**
  * WEBSOCKET
  */
@@ -62,6 +75,8 @@ wss.getUniqueID = function () {
   return s4() + s4() + '-' + s4();
 };
 
+var latLong;
+
 wss.on('connection', function connection(ws, req) {
 
   console.log("Server is open on port", Config.socket_port);
@@ -71,6 +86,10 @@ wss.on('connection', function connection(ws, req) {
   });
 
   ws.on('message', function incoming(recieveData) {
-      console.log('[SERVER] Message:', recieveData);
+      latLong = recieveData.split(',');
+      console.log('[SERVER] Message:', latLong);
+      // This sends it to the front end using the channel name whenever it gets data 
+      // Resource https://gist.github.com/talyguryn/5c46f26b55ffc6aea1bb3d3b03899a04
+      win.webContents.send(CHANNEL_NAME, latLong);
   });
 });
