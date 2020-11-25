@@ -21,59 +21,65 @@
       html,
       body,
       #cesiumContainer {
-        height: 99%;
+        height: 1000px;
         width: auto;
         margin: 0;
-        padding: 10px;
         overflow: none;
+        padding: 10px;
       }
       body {
-        background-color: black;
+        background-color: f0efeb;
       }
     </style>
   </head>
   <body>
     <div class="row">
-      <div class="dropdown col-4">
-        <button
-          class="btn btn-secondary dropdown-toggle"
-          type="button"
-          id="dropdownMenu2"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          Task
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-          <button
-            class="dropdown-item"
-            type="button"
-            onclick="changeTask(tasks.TASK1)"
-          >
-            Task 1
-          </button>
-          <button
-            class="dropdown-item"
-            type="button"
-            onclick="changeTask(tasks.TASK2)"
-          >
-            Task 2
-          </button>
+      <!-- Right Side -->
+      <div class = "col-3">
+        <!-- User position -->
+        <div class = "row justify-content-center">
+          <div class="card" style="width: 21rem;">
+            <div class="card-body">
+              <h5 class="card-title">User Position</h5>
+              <p class="card-text"> Longitude : <a x id="longitude"></a> Latitude : <a  id="latitude"></a></p>
+            </div>
+          </div>
+        </div>
+        <br/>
+        <!-- Logs -->
+        <div class = "row justify-content-center">
+          <div class="card">
+            <div class="card-body" style="width: 21rem;">
+              <h5 class="card-title">Points Of Interest</h5>
+              <ul class="list-group" id="pointsLog" style="height:40rem; width: 19rem; overflow:hidden; overflow-y:scroll;" >
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="col-8" style="color: white">
-        Longitude : <a style="color: white" id="longitude"></a> Latitude :
-        <a style="color: white" id="latitude"></a>
-      </p>
+      <!-- left Side -->
+      <div class = "col-9">
+        <div class="row">
+          <div class="dropdown col-4">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Task </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              <button class="dropdown-item" type="button" onclick="changeTask(tasks.TASK1)" > Task 1 </button>
+              <button class="dropdown-item" type="button" onclick="changeTask(tasks.TASK2)"> Task 2 </button>
+            </div>
+          </div>
+        </div>
+        <br/>
+        <div id="cesiumContainer" style="border-style: solid;"></div>
+      </div>
     </div>
-    <div id="cesiumContainer"></div>
 
+    <!-- Attach Scripts -->
     <script src="./js/constants.js"></script>
     <script src="./js/task-1.js"></script>
     <script src="./js/task-2.js"></script>
+    <script src="./js/insert-points.js"></script>
     <script src="./js/main-viewer.js"></script>
-
+    
     <!-- Bootstrap Optional JavaScript -->
     <!-- jQuery first, then Popper.js v2 CDN version, then Bootstrap JS -->
     <script>
