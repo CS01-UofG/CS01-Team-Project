@@ -48,7 +48,7 @@ function setupTask2() {
 }
 
 // A set of functions to add various icons to the map
-function restaurant(Name, lat, long) {
+function restaurant(Name, lat, long, desc) {
   var pinBuilder = new Cesium.pinBuilder();
   var url = Cesium.buildModuleUrl('https://static.thenounproject.com/png/11637-200.png');
   var restaurantPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.RED, 48), function(canvas) {
@@ -58,12 +58,13 @@ function restaurant(Name, lat, long) {
       billboard : {
         image : canvas.toData.URL(),
         verticalOrigin : Cesium.VerticalOrigin.BOTTOM
-      }
+      },
+      description : desc
     })
   })
 }
 
-function gorcery(Name, lat, long) {
+function gorcery(Name, lat, long, desc) {
   var pinBuilder = new Cesium.pinBuilder();
   var url = Cesium.buildModuleUrl('https://www.materialui.co/materialIcons/maps/local_grocery_store_black_192x192.png');
   var groceryPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.GREEN, 48), function(canvas) {
@@ -73,12 +74,13 @@ function gorcery(Name, lat, long) {
       billboard : {
         image : canvas.toData.URL(),
         verticalOrigin : Cesium.VerticalOrigin.BOTTOM
-      }
+      },
+      description : desc
     })
   })
 }
 
-function bank(Name, lat, long) {
+function bank(Name, lat, long, desc) {
   var pinBuilder = new Cesium.pinBuilder();
   var url = Cesium.buildModuleUrl('https://cdn.iconscout.com/icon/premium/png-256-thumb/bank-account-banking-building-1-31235.png');
   var bankPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.BLUE, 48), function(canvas) {
@@ -88,12 +90,13 @@ function bank(Name, lat, long) {
       billboard : {
         image : canvas.toData.URL(),
         verticalOrigin : Cesium.VerticalOrigin.BOTTOM
-      }
+      },
+      description : desc
     })
   })
 }
 
-function clothing(Name, lat, long) {
+function clothing(Name, lat, long, desc) {
   var pinBuilder = new Cesium.pinBuilder();
   var url = Cesium.buildModuleUrl('https://icons.iconarchive.com/icons/icons8/windows-8/256/Clothing-T-Shirt-icon.png');
   var clothingPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.PURPLE, 48), function(canvas) {
@@ -103,7 +106,56 @@ function clothing(Name, lat, long) {
       billboard : {
         image : canvas.toData.URL(),
         verticalOrigin : Cesium.VerticalOrigin.BOTTOM
-      }
+      },
+      description : desc
+    })
+  })
+}
+
+function library(Name, lat, long, desc) {
+  var pinBuilder = new Cesium.pinBuilder();
+  var url = Cesium.buildModuleUrl('https://static.thenounproject.com/png/79163-200.png');
+  var libraryPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.YELLOW, 48), function(canvas) {
+    return viewer.entities.add({
+      name : Name,
+      position : Cesium.Cartesian3.fromDegrees(lat, long),
+      billboard : {
+        image : canvas.toData.URL(),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+      },
+      description : desc
+    })
+  })
+}
+
+function coffee(Name, lat, long, desc) {
+  var pinBuilder = new Cesium.pinBuilder();
+  var url = Cesium.buildModuleUrl('https://www.codester.com/static/uploads/items/5325/icon.png');
+  var coffeePin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.ORANGE, 48), function(canvas) {
+    return viewer.entities.add({
+      name : Name,
+      position : Cesium.Cartesian3.fromDegrees(lat, long),
+      billboard : {
+        image : canvas.toData.URL(),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+      },
+      description : desc
+    })
+  })
+}
+
+function school(Name, lat, long, desc) {
+  var pinBuilder = new Cesium.pinBuilder();
+  var url = Cesium.buildModuleUrl('https://cdn1.iconfinder.com/data/icons/maps-and-locations/16/school-256.png');
+  var schoolPin = Cesium.when(pinBuilder.fromUrl(url, Cesium.Color.INDIGO, 48), function(canvas) {
+    return viewer.entities.add({
+      name : Name,
+      position : Cesium.Cartesian3.fromDegrees(lat, long),
+      billboard : {
+        image : canvas.toData.URL(),
+        verticalOrigin : Cesium.VerticalOrigin.BOTTOM
+      },
+      description : desc
     })
   })
 }
