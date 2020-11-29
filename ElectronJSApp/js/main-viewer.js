@@ -1,6 +1,6 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer } = require("electron");
 /** Define channel name */
-const CHANNEL_NAME = 'main';
+const CHANNEL_NAME = "main";
 
 function changeTask(s) {
   switch (s) {
@@ -14,17 +14,11 @@ function changeTask(s) {
       break;
   }
 }
-//Cesium.Ion.defaultAccessToken =
-("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ZWVkMmMwNC1lMjIxLTQ0ZTYtYTM3Mi03ZmFjYTAzMzg2NDUiLCJpZCI6MzgyMzQsImlhdCI6MTYwNjEzODA5NX0._NCuB_LT12OcCjUvFnWAo4-zkBKYM4Mu4AdDLduT-e8");
+
 var viewer = new Cesium.Viewer("cesiumContainer");
 
 viewer.terrainProvider = Cesium.createWorldTerrain();
 
-// var viewer = new Cesium.Viewer("cesiumContainer", {
-//   terrainProvider: new Cesium.CesiumTerrainProvider({
-//     url: Cesium.IonResource.fromAssetId(1),
-//   }),
-// });
 viewer.scene.globe.depthTestAgainstTerrain = true;
 
 // in the future this will be received from the sensor
@@ -32,7 +26,6 @@ viewer.scene.globe.depthTestAgainstTerrain = true;
 // Glasgow Uni 55.873543, 	-4.289058
 // var sensorLong = -4.289058;
 // var sensorLat = 55.873543;
-
 
 // mountains north of Glasgow, we have steep slopes so we can properly see the intersection
 // with the earth surface
@@ -42,7 +35,6 @@ var sensorLat = 57.06;
 // Show user Long and lat
 document.getElementById("longitude").innerHTML = sensorLong;
 document.getElementById("latitude").innerHTML = sensorLat;
-
 
 /** Add IPC event listener which enables user to add points */
 ipcRenderer.on(CHANNEL_NAME, (event, data) => {
