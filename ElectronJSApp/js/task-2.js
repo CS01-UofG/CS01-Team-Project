@@ -12,9 +12,9 @@ function setupTask2() {
     },
   });
 
-  // unit vector in cartesian coordinates, the direction the sensor is looking at
+  // vector in cartesian coordinates, the direction the sensor is looking at
   var direction = new Cesium.Cartesian3(1.0, 8.0, 0.0);
-  Cesium.Cartesian3.normalize(direction, direction);
+
   // this is an infinite line that we can use to get the intersection with the terrain
   var ray = new Cesium.Ray(sensorCartesian, direction);
 
@@ -29,6 +29,10 @@ function setupTask2() {
       outlineColor: Cesium.Color.WHITE,
       outlineWidth: 2,
     },
+    description: `Distance from sensor : ${Cesium.Cartesian3.distance(
+      sensorCartesian,
+      intersection
+    ).toFixed(3)} m.`,
   });
 
   // some point along the infinite line to get a better feeling of the direction
