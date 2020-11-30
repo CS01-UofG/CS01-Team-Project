@@ -13,8 +13,7 @@ const Config = {
 };
 
 // Http server
-const _app = express();
-const server = require('http').Server(_app);
+const server = require('http').Server(express);
 server.listen(Config.http_port);
 
 // WSS server
@@ -31,7 +30,7 @@ function createWindow() {
     frame: true,
     // Disables dev tools
     webPreferences: {
-      devTools: true,
+      devTools: false,
       nodeIntegration: true
     },
   });
@@ -40,7 +39,7 @@ function createWindow() {
   win.webContents.openDevTools();
 
   /** Load the index.html page */
-  win.loadFile('index.html');
+  win.loadFile('app/index.html');
 
 }
 
@@ -51,6 +50,7 @@ const init = () => {
 };
 
 app.on('ready', init);
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

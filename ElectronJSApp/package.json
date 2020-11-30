@@ -2,9 +2,9 @@
   "name": "electronjsapp",
   "version": "1.0.0",
   "description": "Application for Team Project CS01, Proposed by Thales. ",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "electron ."
   },
   "repository": {
@@ -15,7 +15,9 @@
   "license": "MIT License",
   "devDependencies": {
     "cesium": "^1.75.0",
-    "electron": "10.1.5"
+    "electron": "10.1.5",
+    "mocha": "^8.0.0",
+    "spectron": "^12.0.0"
   },
   "dependencies": {
     "express": "^4.16.4",
