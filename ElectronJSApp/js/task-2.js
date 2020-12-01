@@ -44,6 +44,14 @@ function setupTask2() {
     });
   }
 
+  restaurant("Subway", 55.875270, -4.293983, "Byres Road Subway. Has great student deals");
+  coffee("Starbucks Coffee", 55.875333, -4.293415, "Overpriced coffee. What else can I say?");
+  coffee("Pret a Manager", 55.875533, -4.293111, "They have great vegetarian sandwiches and wraps.");
+  gorcery("Tesco Metro", 55.876036, -4.292530, "Pretty meh when it comes to deals.");
+  bank("The Royal Bank of Scotlnad", 55.877033, -4.291973, "Quick and efficient customer service.");
+  clothing("Starry Starry Night", 55.875223, -4.294627, "?");
+  school("University of Glasgow", 55.872398, -4.289130, "Our school!");
+
   viewer.zoomTo(user);
 }
 
