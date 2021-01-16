@@ -1,9 +1,52 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+// Modules to control application life and create native browser window
+const path = require('path')
 const WebSocket = require('ws');
 const express = require('express');
+const {app, BrowserWindow, ipcMain} = require('electron')
 
-let win;
-const CHANNEL_NAME = 'main';
+var mainWindow = null;
+
+function createWindow () {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 1920,
+    height: 1080,
+
+    // Disables dev tools
+    webPreferences: {
+      devTools: true,
+      nodeIntegration: false,
+      contextIsolation: true, //required to be false for unit testing to work
+      preload: path.join(__dirname, 'preload.js')
+    },
+  });
+
+  // and load the index.html of the app.
+  mainWindow.loadURL('file://' + __dirname + '/index.html')
+
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools()
+}
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.whenReady().then(() => {
+  createWindow()
+  
+  app.on('activate', function () {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
 
 // Create Websocket - Inspiration https://github.com/mafikes/electron-websocket-express
 const Config = {
@@ -20,53 +63,6 @@ server.listen(Config.http_port);
 const wss = new WebSocket.Server({port: Config.socket_port});
 
 
-// Create Electron Window
-function createWindow() {
-  
-  win = new BrowserWindow({
-    width: 1920,
-    height: 1080,
-    // Disables window headers
-    frame: true,
-    // Disables dev tools
-    webPreferences: {
-      devTools: false,
-      nodeIntegration: true
-    },
-  });
-
-  /** Open devTools */
-  win.webContents.openDevTools();
-
-  /** Load the index.html page */
-  win.loadFile('app/index.html');
-
-}
-
-const init = () => {
-  /** Create app window */
-  createWindow();
-  // Can use this place to initialize other things :) 
-};
-
-app.on('ready', init);
-
-
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-})
-
-/**
- * WEBSOCKET
- */
 wss.getUniqueID = function () {
   function s4() {
       return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -84,12 +80,14 @@ wss.on('connection', function connection(ws, req) {
   ws.on('close', function close() {
       console.log('[SERVER]: Client disconnected.');
   });
-
+ 
   ws.on('message', function incoming(recieveData) {
       latLong = recieveData.split(',');
       console.log('[SERVER] Message:', latLong);
       // This sends it to the front end using the channel name whenever it gets data 
       // Resource https://gist.github.com/talyguryn/5c46f26b55ffc6aea1bb3d3b03899a04
-      win.webContents.send(CHANNEL_NAME, latLong);
+
+      mainWindow.webContents.send("fromMain", latLong);
+      console.log("getsData");
   });
 });

@@ -5,3 +5,5 @@ const tasks = {
 
 // this is 1 meter in degrees
 const coef = 0.0000089;
+
+const CHANNEL_NAME = "main";

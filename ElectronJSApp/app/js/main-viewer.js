@@ -1,7 +1,4 @@
-const { ipcRenderer } = require("electron");
-/** Define channel name */
-const CHANNEL_NAME = "main";
-
+// const { ipcRenderer } = require("electron");
 function changeTask(s) {
   switch (s) {
     case tasks.TASK1:
@@ -36,11 +33,11 @@ var sensorLat = 57.06;
 document.getElementById("longitude").innerHTML = sensorLong;
 document.getElementById("latitude").innerHTML = sensorLat;
 
-/** Add IPC event listener which enables user to add points */
-ipcRenderer.on(CHANNEL_NAME, (event, data) => {
-  console.log(data);
-  addPoint(data);
-});
+// /** Add IPC event listener which enables user to add points */
+// ipcRenderer.on(CHANNEL_NAME, (event, data) => {
+//   console.log(data);
+//   addPoint(data);
+// });
 
 // converting sensor from degrees to cartesian coordinates i.e. (x, y, z)
 var sensorCartesian = Cesium.Cartesian3.fromDegrees(

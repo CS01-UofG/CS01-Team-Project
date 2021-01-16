@@ -1,0 +1,13 @@
+image: node:14.15.0
+
+cache:
+  paths:
+  - ElectronJSApp/node_modules/
+
+all_tests:
+  tags:
+    - docker
+  script:
+   - cd ElectronJSApp/
+   - npm install
+   - npm test
