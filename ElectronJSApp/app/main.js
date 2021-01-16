@@ -20,6 +20,7 @@ app.on('ready', function() {
       webPreferences: {
         devTools: false,
         nodeIntegration: false,  //required to be false for unit testing to work
+        preload: ('file://' + __dirname + '/preload.js')
       },
     });
   
