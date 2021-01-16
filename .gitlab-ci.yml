@@ -5,6 +5,8 @@ cache:
   - ElectronJSApp/node_modules/
 
 all_tests:
+   tags:
+    - docker
   script:
    - cd ElectronJSApp/
    - npm install
