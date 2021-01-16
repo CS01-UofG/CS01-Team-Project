@@ -1,7 +1,4 @@
 // const { ipcRenderer } = require("electron");
-/** Define channel name */
-const CHANNEL_NAME = "main";
-
 function changeTask(s) {
   switch (s) {
     case tasks.TASK1:
