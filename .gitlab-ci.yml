@@ -7,12 +7,16 @@ cache:
   paths:
   - ElectronJSApp/node_modules/
 
-stages:
-  - build
-  - test
-  - deploy
+release-job: 
+  tags:
+    - docker
+  before_script: 
+    - cd ElectronJSApp/
+    - npm install
+  script: 
+    - npm run make
 
-job1:
+test-job:
   tags:
     - docker
   before_script: 
