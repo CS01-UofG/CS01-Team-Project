@@ -7,9 +7,12 @@ cache:
 all_tests:
   tags:
     - docker
-  before_script:
-    docker pull selenium/standalone-chrome
+  environment:
+    - DISPLAY=:99
+    - NODE_ENV=test 
   script:
-   - cd ElectronJSApp/
-   - npm install
-   - npm test
+    - Xvfb :99 -ac &
+    - sleep 5
+    - cd ElectronJSApp/
+    - npm install
+    - npm test
