@@ -1,4 +1,4 @@
-image: node:14.15.0
+image: pieterscheffers/docker-spectron
 
 cache:
   paths:
@@ -7,7 +7,8 @@ cache:
 all_tests:
   tags:
     - docker
+  
   script:
-   - cd ElectronJSApp/
-   - npm install
-   - npm test
+    - cd ElectronJSApp/
+    - npm install
+    - npm test
