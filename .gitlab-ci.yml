@@ -1,14 +1,22 @@
-image: pieterscheffers/docker-spectron
-
+default:
+  image: node:14.15.0
+  before_script:
+    - echo "Test and Build pipelines" 
+  
 cache:
   paths:
   - ElectronJSApp/node_modules/
 
-all_tests:
+stages:
+  - build
+  - test
+  - deploy
+
+job1:
   tags:
     - docker
-  
-  script:
+  before_script: 
     - cd ElectronJSApp/
     - npm install
+  script:
     - npm test
