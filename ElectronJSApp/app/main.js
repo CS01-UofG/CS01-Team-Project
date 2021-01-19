@@ -55,9 +55,6 @@ const Config = {
   local_host: '127.0.0.1'
 };
 
-// Http server
-const server = require('http').Server(express);
-server.listen(Config.http_port);
 
 // WSS server
 const wss = new WebSocket.Server({port: Config.socket_port});
@@ -88,6 +85,5 @@ wss.on('connection', function connection(ws, req) {
       // Resource https://gist.github.com/talyguryn/5c46f26b55ffc6aea1bb3d3b03899a04
 
       mainWindow.webContents.send("fromMain", latLong);
-      console.log("getsData");
   });
 });
