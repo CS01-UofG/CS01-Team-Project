@@ -5,12 +5,12 @@ default:
     - docker 
     
   services:
-    - selenium/standalone-chrome:latest
+    - arendjan123/spectronnode12:latest 
 
 test:
   script:
-    - npm install electron-chromedriver
-    - ./node_modules/.bin/chromedriver
     - cd ElectronJSApp/
+    - export DISPLAY=:9.0"
+    - Xvfb :9.0 -screen 0 1024x764x24 &
     - npm install
     - npm test
