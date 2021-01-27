@@ -1,8 +1,16 @@
-image: node:14.15.0-browsers
+default:
+  image: node:14.15.0
+  
+  tags: 
+    - docker 
+    
+  services:
+    - selenium/standalone-chrome:latest
 
-all_tests:
-  tags:
-    - docker
+  before_script:
+    - bundle install
+
+test:
   script:
     - cd ElectronJSApp/
     - npm install
