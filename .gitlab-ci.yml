@@ -1,8 +1,4 @@
-image: pieterscheffers/docker-spectron
-
-cache:
-  paths:
-  - ElectronJSApp/node_modules/
+image: node:14.15.0
 
 all_tests:
   tags:
