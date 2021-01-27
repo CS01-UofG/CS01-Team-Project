@@ -7,9 +7,6 @@ default:
   services:
     - selenium/standalone-chrome:latest
 
-  before_script:
-    - bundle install
-
 test:
   script:
     - cd ElectronJSApp/
