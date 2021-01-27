@@ -9,10 +9,8 @@ default:
 
 test:
   script:
-    # Install display server dependencies
-    - "apt install xvfb libxtst6 libxss1 libgtk2.0-0 -y"
-    # Install core libraries for chromium driver
-    - "apt install libnss3 libasound2 libgconf-2-4 -y"
+    - npm install electron-chromedriver
+    - ./node_modules/.bin/chromedriver
     - cd ElectronJSApp/
     - npm install
     - npm test
