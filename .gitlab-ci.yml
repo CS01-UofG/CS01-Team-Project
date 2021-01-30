@@ -4,11 +4,17 @@ default:
   tags: 
     - docker 
     
+e2e:chrome:
+  stage: confidence-check
+  services:
+    - selenium/standalone-chrome
+  script:
+    - npm run confidence-check --host=selenium__standalone-chrome
 
 test:
   script:
     - cd ElectronJSApp/
-    - export DISPLAY="9.0"
-    - Xvfb :9.0 -screen 0 1024x764x24 &
     - npm install
     - npm test
+    
+
