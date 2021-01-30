@@ -1,20 +1,16 @@
 default:
   image: node:14.15.0
-  
-  tags: 
-    - docker 
-    
-e2e:chrome:
-  stage: confidence-check
   services:
     - selenium/standalone-chrome
-  script:
-    - npm run confidence-check --host=selenium__standalone-chrome
-
+  tags: 
+    - docker 
+   
 test:
+  stage: test 
   script:
     - cd ElectronJSApp/
     - npm install
     - npm test
     
+
 
