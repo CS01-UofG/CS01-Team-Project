@@ -1,14 +1,12 @@
 default:
-  image: pieterscheffers/docker-spectron
+  image: electronuserland/electron-builder:wine
   tags: 
     - docker 
-   
+
 test:
   stage: test 
   script:
-    - ls -a
     - cd ElectronJSApp/
-    - npm install
     - npm test
     
 
