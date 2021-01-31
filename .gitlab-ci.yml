@@ -7,6 +7,7 @@ test:
   stage: test 
   script:
     - cd ElectronJSApp/
+    - npm install
     - npm test
     
 
