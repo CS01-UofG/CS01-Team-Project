@@ -1,7 +1,11 @@
-default:
-  image: electronuserland/electron-builder:wine
-  tags: 
-    - docker 
+.shared_windows_runners:
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+
+stages:
+  - test
 
 test:
   stage: test 
