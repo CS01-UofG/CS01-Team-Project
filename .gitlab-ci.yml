@@ -1,14 +1,18 @@
-image: pieterscheffers/docker-spectron
-
-cache:
-  paths:
-  - ElectronJSApp/node_modules/
-
-all_tests:
+.shared_windows_runners:
   tags:
-    - docker
-  
+  - shared-windows
+  - windows
+  - windows-1809
+
+stages:
+  - test
+
+test:
+  stage: test 
   script:
     - cd ElectronJSApp/
     - npm install
     - npm test
+    
+
+
