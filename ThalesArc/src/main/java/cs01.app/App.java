@@ -3,7 +3,6 @@ package cs01.app;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
@@ -45,17 +44,17 @@ import javafx.stage.Stage;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
-    Point user;
+    private Point user;
+    private GraphicsOverlay userPosition;
+    private GraphicsOverlay graphicsOverlay;
+    private GraphicsOverlay polygonLayer;
 
     private SceneView sceneView;
 
-    public TitledPane bigLeftBox = new TitledPane();
-    public VBox leftBox = new VBox(bigLeftBox);
-
     public TitledPane options = new TitledPane();
-    public VBox leftBox1 = new VBox(options);
+    public VBox leftBox = new VBox(options);
 
-    public ListView pointVisualList = new ListView();
+    public ListView<Text> pointVisualList = new ListView<Text>();
     public VBox leftBox2 = new VBox(pointVisualList);
 
     private ToggleButton FOVToggle;
@@ -75,6 +74,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
+
         String yourApiKey = "AAPKb67d305991d24fa89d69e310a58fa1f8xryw7mKYrKOZF9_A49GmTH_Bqj9GSEiAxI9Rv6Uqdj3ProCQ-S1D1dpYNNhW4mjk";
         ArcGISRuntimeEnvironment.setApiKey(yourApiKey);
 
@@ -94,14 +95,18 @@ public class App extends Application {
         sceneView.setArcGISScene(scene);
 
         // create a graphics overlay and add it to the map view for points and more
-        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+        userPosition = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        sceneView.getGraphicsOverlays().add(userPosition);
+
+        // create a graphics overlay and add it to the map view for points and more
+        graphicsOverlay = new GraphicsOverlay();
         sceneView.getGraphicsOverlays().add(graphicsOverlay);
         // create a graphics overlay and add polylines to it and set to false
-        GraphicsOverlay polygonLayer = new GraphicsOverlay();
+        polygonLayer = new GraphicsOverlay();
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
-        // add a scene layer for buildings
+        // add a scene layer for buildings - Located in Berst France
         final String buildings = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Brest/SceneServer/layers/0";
         ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer(buildings);
         scene.getOperationalLayers().add(sceneLayer);
@@ -130,7 +135,7 @@ public class App extends Application {
                 //append message of the Text Area of UI (GUI Thread)
                 Platform.runLater(()
                         ->
-                        leftBox.getChildren().add(new Text("New server started at " + new Date() + '\n')));
+                        pointVisualList.getItems().add(new Text("New server started at " + userData.host +' '+ userData.port + '\n')));
 
                 //continous loop
                 while (true) {
@@ -150,7 +155,6 @@ public class App extends Application {
                     Platform.runLater(() -> {
                         Point sample = new Point(arr[0], arr[1],50);
                         pointLists.add(sample);
-                        System.out.println(pointLists);
                         addPoint(sample, graphicsOverlay, pointVisualList);
                         drawPolylines(pointLists, polygonLayer);
                         showLineOfSight(user, pointLists, fovOverlay);
@@ -160,6 +164,7 @@ public class App extends Application {
                 leftBox.getChildren().add(new Text(ex.toString()));
             }
         }).start();
+        moveUser(user); //Add user and its point
 
         Label FOV = new Label("Show Field Of View");
         FOVToggle = new ToggleButton("Show FOV");
@@ -235,7 +240,7 @@ public class App extends Application {
         maxDistanceSlider.setMinorTickCount(5);
         maxDistanceSlider.setBlockIncrement(10);
 
-        leftBox1.getChildren().addAll(Polylines,polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        leftBox.getChildren().addAll(Polylines,polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
 
         centre.getChildren().addAll(sceneView);
 //        StackPane.setAlignment(polylinesButton, Pos.TOP_LEFT);
@@ -248,17 +253,11 @@ public class App extends Application {
         FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
 
         // set the user and camera
-        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
+
+//        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
         Camera camera = new Camera(user, 500.0, 10.0, 80.0, 0.0);
         sceneView.setViewpointCamera(camera);
-        // Add User Point
-        SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
-        SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
-        userMarkerSymbol.setOutline(blueOutlineSymbol);
-        // create a graphic with the point geometry and symbol
-        Graphic pointGraphic = new Graphic(user, userMarkerSymbol);
-        // add the point graphic to the graphics overlay
-        graphicsOverlay.getGraphics().add(pointGraphic);
+
 
         // create a userViewshed from the camera
         LocationViewshed userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
@@ -284,6 +283,8 @@ public class App extends Application {
                         pointBuilder.setZ(point.getZ());
                         userViewshed.setLocation(pointBuilder.toGeometry());
                         // add listener back
+                        user = point;
+                        moveUser(user);
                         sceneView.setOnMouseMoved(this);
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
@@ -329,8 +330,6 @@ public class App extends Application {
 
 
         SplitPane mainSplit = new SplitPane();
-//        leftBox.getChildren().add(leftBox1);
-        leftBox.getChildren().add( leftBox1);
         leftBox.getChildren().add( leftBox2);
         mainSplit.getItems().addAll(leftBox, centre );
         mainSplit.setDividerPosition(0,1/(double)12);
@@ -364,7 +363,7 @@ public class App extends Application {
     }
 
     //  Given a point it can add it to the map
-    public void addPoint(Point point, GraphicsOverlay graphicsOverlay, ListView list){
+    public void addPoint(Point point, GraphicsOverlay graphicsOverlay, ListView<Text> list){
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol simpleMarkerSymbol =
                 new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFF5733, 10);
@@ -399,12 +398,23 @@ public class App extends Application {
         // add the polyline graphic to the graphics overlay
         graphicsOverlay.getGraphics().add(polylineGraphic);
     }
-    //        Function to add lineofsight
+
+    // Function to add lineofsight
     public void lineOfSight(Point point1, Point point2, AnalysisOverlay viewshedOverlay) {
         LocationLineOfSight lineOfSight = new LocationLineOfSight(point1, point2);
         viewshedOverlay.getAnalyses().add(lineOfSight);
     }
 
+    public void moveUser(Point newLocation) {
+        userPosition.getGraphics().clear();
+        // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
+        SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
+        SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
+        userMarkerSymbol.setOutline(blueOutlineSymbol);
+        // create a graphic with the point zgeometry and symbol
+        Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
+        userPosition.getGraphics().add(pointGraphic);
+    }
     /**
      * Stops and releases all resources used in application.
      */
