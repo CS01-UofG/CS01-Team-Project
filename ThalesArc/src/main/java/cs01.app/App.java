@@ -11,8 +11,7 @@ import com.esri.arcgisruntime.geoanalysis.LocationLineOfSight;
 import com.esri.arcgisruntime.geometry.*;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
-import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
-import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+import com.esri.arcgisruntime.symbology.*;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.geoanalysis.LocationViewshed;
 import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
@@ -22,6 +21,7 @@ import com.esri.arcgisruntime.mapping.view.SceneView;
 import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 
@@ -45,11 +45,13 @@ import javafx.stage.Stage;
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
     private Point user;
+    TextField userTextField = new TextField();
+    private LocationViewshed userViewshed;
+
     private GraphicsOverlay userPosition;
     private GraphicsOverlay graphicsOverlay;
     private GraphicsOverlay polygonLayer;
     private AnalysisOverlay fovOverlay;
-
     private SceneView sceneView;
 
     public TitledPane options = new TitledPane();
@@ -62,6 +64,8 @@ public class App extends Application {
     private ToggleButton polylinesToggle;
     private ToggleButton visibilityToggle;
     private ToggleButton frustumToggle;
+
+    private Button cameraButton;
     private Slider headingSlider;
     private Slider pitchSlider;
     private Slider horizontalAngleSlider;
@@ -75,8 +79,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
-
         String yourApiKey = "AAPKb67d305991d24fa89d69e310a58fa1f8xryw7mKYrKOZF9_A49GmTH_Bqj9GSEiAxI9Rv6Uqdj3ProCQ-S1D1dpYNNhW4mjk";
         ArcGISRuntimeEnvironment.setApiKey(yourApiKey);
 
@@ -116,6 +118,10 @@ public class App extends Application {
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
+        user = new Point( -4.484419007880914, 48.39127111485687, 50, SpatialReferences.getWgs84());
+        updateCameraPosition();
+
+
         // add a scene layer for buildings - Located in Berst France
         final String buildings = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Brest/SceneServer/layers/0";
         ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer(buildings);
@@ -151,15 +157,10 @@ public class App extends Application {
                     fromClient = in.readLine();
                     System.out.println("received: " + fromClient);
 
-                    double[] arr = Stream.of(fromClient.split(","))
-                            .mapToDouble (Double::parseDouble)
-                            .toArray();
-                    //append message of the Text Area of UI (GUI Thread)
                     Platform.runLater(() -> {
-                        Point sample = new Point(arr[0], arr[1],50);
-                        pointLists.add(sample);
-                        addPoint(sample, graphicsOverlay, pointVisualList);
-                        drawPolylines(pointLists, polygonLayer);
+
+                        parseData(fromClient);
+
                     });
                 }
             } catch (IOException ex) {
@@ -242,10 +243,13 @@ public class App extends Application {
         maxDistanceSlider.setMinorTickCount(5);
         maxDistanceSlider.setBlockIncrement(10);
 
-        leftBox.getChildren().addAll(Polylines,polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        // create a button to update the view
+        cameraButton = new Button("Update camera");
+        cameraButton.setOnMouseClicked(e -> updateCameraPosition());
 
-        centre.getChildren().addAll(sceneView);
-//        StackPane.setAlignment(polylinesButton, Pos.TOP_LEFT);
+        leftBox.getChildren().addAll(userTextField, Polylines,polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        centre.getChildren().addAll(sceneView, cameraButton);
+        StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
 //        StackPane.setAlignment(FOVToggle, Pos.TOP_LEFT);
 
         polylinesToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(polylinesToggle.isSelected()) );
@@ -254,15 +258,16 @@ public class App extends Application {
         FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(FOVToggle.isSelected()) );
         FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
 
+
+
         // set the user and camera
 
 //        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
-        Camera camera = new Camera(user, 500.0, 10.0, 80.0, 0.0);
-        sceneView.setViewpointCamera(camera);
+
 
 
         // create a userViewshed from the camera
-        LocationViewshed userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
+        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
                 horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
                 maxDistanceSlider.getValue());
         // set the colors of the visible and obstructed areas
@@ -408,6 +413,7 @@ public class App extends Application {
         fovOverlay.getAnalyses().add(lineOfSight);
     }
 
+    // Moves the user and fov cone to a new location
     public void moveUser(Point newLocation) {
 
         showLineOfSight(user, pointLists);
@@ -418,8 +424,46 @@ public class App extends Application {
         userMarkerSymbol.setOutline(blueOutlineSymbol);
         // create a graphic with the point zgeometry and symbol
         Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
+        updateUserText();
         userPosition.getGraphics().add(pointGraphic);
     }
+
+    // Parses data and adds points and polylines in format of User:xyz, Point: xyz -> xyz,xyz
+    public void parseData(String data){
+        double[] arr = Stream.of(data.split(","))
+                .mapToDouble (Double::parseDouble)
+                .toArray();
+
+        user = new Point(arr[0], arr[1],arr[2]);
+        Point viewSpot = new Point(arr[3], arr[4],arr[5]);
+
+        moveUser(user);
+        updateUserText();
+
+        PointBuilder pointBuilder = new PointBuilder(user);
+        pointBuilder.setZ(user.getZ() + 100);
+        userViewshed.setLocation(user);
+
+
+        pointLists.add(viewSpot);
+        addPoint(viewSpot, graphicsOverlay, pointVisualList);
+        drawPolylines(pointLists, polygonLayer);
+    }
+
+    // Updates the user location in text bar
+    public void updateUserText(){
+        double x = user.getX();
+        double y = user.getY();
+        userTextField.setText("x: " + x + " y: " + y + " z: " + user.getZ());
+    }
+
+    // Updates the default camera position to where the user is
+    public void updateCameraPosition(){
+        Camera camera = new Camera(user, 500.0, 10.0, 60.0, 0.0);
+        sceneView.setViewpointCamera(camera);
+    }
+
+
     /**
      * Stops and releases all resources used in application.
      */
