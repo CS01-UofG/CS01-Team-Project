@@ -308,10 +308,10 @@ public class App extends Application {
         });
 
         // toggle visibility
-        visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(visibilityToggle.isSelected()));
-        visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "ON" : "OFF", visibilityToggle.selectedProperty()));
-        frustumToggle.selectedProperty().addListener(e -> userViewshed.setFrustumOutlineVisible(frustumToggle.isSelected()));
-        frustumToggle.textProperty().bind(Bindings.createStringBinding(() -> frustumToggle.isSelected() ? "ON" : "OFF", frustumToggle.selectedProperty()));
+        visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
+        visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
+        frustumToggle.selectedProperty().addListener(e -> userViewshed.setFrustumOutlineVisible(!frustumToggle.isSelected()));
+        frustumToggle.textProperty().bind(Bindings.createStringBinding(() -> frustumToggle.isSelected() ? "OFF" : "ON", frustumToggle.selectedProperty()));
         // heading slider
         headingSlider.valueProperty().addListener(e -> userViewshed.setHeading(headingSlider.getValue()));
         // pitch slider
@@ -333,7 +333,7 @@ public class App extends Application {
         leftBox.getChildren().add( leftBox1);
         leftBox.getChildren().add( leftBox2);
         mainSplit.getItems().addAll(leftBox, centre );
-        mainSplit.setDividerPosition(1,1/(double)12);
+        mainSplit.setDividerPosition(0,1/(double)12);
         mainSplit.setDividerPosition(2,11/(double)12);
 
         SplitPane root = new SplitPane();
