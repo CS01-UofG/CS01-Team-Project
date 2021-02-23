@@ -48,6 +48,7 @@ public class App extends Application {
     private GraphicsOverlay userPosition;
     private GraphicsOverlay graphicsOverlay;
     private GraphicsOverlay polygonLayer;
+    private AnalysisOverlay fovOverlay;
 
     private SceneView sceneView;
 
@@ -94,15 +95,24 @@ public class App extends Application {
         sceneView = new SceneView();
         sceneView.setArcGISScene(scene);
 
+        // create an analysis overlay for the userViewshed
+        AnalysisOverlay viewshedOverlay = new AnalysisOverlay();
+        sceneView.getAnalysisOverlays().add(viewshedOverlay);
+
+        // create an analysis overlay for the line of sight
+        fovOverlay = new AnalysisOverlay();
+        sceneView.getAnalysisOverlays().add(fovOverlay);
+        fovOverlay.setVisible(false);
+
         // create a graphics overlay and add it to the map view for points and more
         userPosition = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         sceneView.getGraphicsOverlays().add(userPosition);
 
         // create a graphics overlay and add it to the map view for points and more
-        graphicsOverlay = new GraphicsOverlay();
+        graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         sceneView.getGraphicsOverlays().add(graphicsOverlay);
         // create a graphics overlay and add polylines to it and set to false
-        polygonLayer = new GraphicsOverlay();
+        polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
@@ -117,13 +127,6 @@ public class App extends Application {
         surface.getElevationSources().add(elevationSource);
         scene.setBaseSurface(surface);
 
-        // create an analysis overlay for the userViewshed
-        AnalysisOverlay viewshedOverlay = new AnalysisOverlay();
-        sceneView.getAnalysisOverlays().add(viewshedOverlay);
-        // create an analysis overlay for the line of sight
-        AnalysisOverlay fovOverlay = new AnalysisOverlay();
-        sceneView.getAnalysisOverlays().add(fovOverlay);
-        fovOverlay.setVisible(false);
 
         // Sockets implementation
         //create a new thread
@@ -157,7 +160,6 @@ public class App extends Application {
                         pointLists.add(sample);
                         addPoint(sample, graphicsOverlay, pointVisualList);
                         drawPolylines(pointLists, polygonLayer);
-                        showLineOfSight(user, pointLists, fovOverlay);
                     });
                 }
             } catch (IOException ex) {
@@ -249,7 +251,7 @@ public class App extends Application {
         polylinesToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(polylinesToggle.isSelected()) );
         polylinesToggle.textProperty().bind(Bindings.createStringBinding(() -> polylinesToggle.isSelected() ? "ON" : "OFF", polylinesToggle.selectedProperty()));
 
-        FOVToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(FOVToggle.isSelected()) );
+        FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(FOVToggle.isSelected()) );
         FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
 
         // set the user and camera
@@ -348,10 +350,11 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    public void showLineOfSight(Point user, ArrayList<Point> pointLists, AnalysisOverlay viewshedOverlay){
+    public void showLineOfSight(Point user, ArrayList<Point> pointLists){
         int len = pointLists.size();
+        fovOverlay.getAnalyses().clear();
         for (Point list : pointLists) {
-            lineOfSight(user, list, viewshedOverlay);
+            lineOfSight(user, list);
         }
     }
 
@@ -400,12 +403,14 @@ public class App extends Application {
     }
 
     // Function to add lineofsight
-    public void lineOfSight(Point point1, Point point2, AnalysisOverlay viewshedOverlay) {
+    public void lineOfSight(Point point1, Point point2) {
         LocationLineOfSight lineOfSight = new LocationLineOfSight(point1, point2);
-        viewshedOverlay.getAnalyses().add(lineOfSight);
+        fovOverlay.getAnalyses().add(lineOfSight);
     }
 
     public void moveUser(Point newLocation) {
+
+        showLineOfSight(user, pointLists);
         userPosition.getGraphics().clear();
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
