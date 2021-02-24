@@ -7,17 +7,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.ServiceFeatureTable;
+import com.esri.arcgisruntime.geoanalysis.GeoElementViewshed;
 import com.esri.arcgisruntime.geoanalysis.LocationLineOfSight;
 import com.esri.arcgisruntime.geometry.*;
-import com.esri.arcgisruntime.mapping.view.Graphic;
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
+import com.esri.arcgisruntime.layers.FeatureLayer;
+import com.esri.arcgisruntime.mapping.view.*;
 import com.esri.arcgisruntime.symbology.*;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.geoanalysis.LocationViewshed;
 import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
-import com.esri.arcgisruntime.mapping.view.AnalysisOverlay;
-import com.esri.arcgisruntime.mapping.view.Camera;
-import com.esri.arcgisruntime.mapping.view.SceneView;
 import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -53,7 +52,7 @@ public class App extends Application {
     private GraphicsOverlay polygonLayer;
     private AnalysisOverlay fovOverlay;
     private SceneView sceneView;
-
+    private AnalysisOverlay viewshedOverlay;
     public TitledPane options = new TitledPane();
     public VBox leftBox = new VBox(options);
 
@@ -97,45 +96,48 @@ public class App extends Application {
         sceneView = new SceneView();
         sceneView.setArcGISScene(scene);
 
-        // create an analysis overlay for the userViewshed
-        AnalysisOverlay viewshedOverlay = new AnalysisOverlay();
-        sceneView.getAnalysisOverlays().add(viewshedOverlay);
+        // add a scene layer for buildings - Located in Berst France
+        final String buildings = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Brest/SceneServer/layers/0";
+        ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer(buildings);
+        scene.getOperationalLayers().add(sceneLayer);
 
+//        // Elevation Layer
+//        ArcGISTiledElevationSource elevationSource = new ArcGISTiledElevationSource("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer");
+//        Surface surface = new Surface();
+//        surface.getElevationSources().add(elevationSource);
+//        scene.setBaseSurface(surface);
+
+        // add base surface for elevation data
+        Surface surface = new Surface();
+        surface.getElevationSources().add(new ArcGISTiledElevationSource("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
+        scene.setBaseSurface(surface);
         // create an analysis overlay for the line of sight
         fovOverlay = new AnalysisOverlay();
         sceneView.getAnalysisOverlays().add(fovOverlay);
         fovOverlay.setVisible(false);
+            // create an analysis overlay for the userViewshed
+        viewshedOverlay = new AnalysisOverlay();
+        sceneView.getAnalysisOverlays().add(viewshedOverlay);
 
         // create a graphics overlay and add it to the map view for points and more
         userPosition = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        userPosition.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
         sceneView.getGraphicsOverlays().add(userPosition);
 
         // create a graphics overlay and add it to the map view for points and more
         graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        graphicsOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
         sceneView.getGraphicsOverlays().add(graphicsOverlay);
         // create a graphics overlay and add polylines to it and set to false
         polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
+        // Initialize user point
         user = new Point( -4.484419007880914, 48.39127111485687, 50, SpatialReferences.getWgs84());
         updateCameraPosition();
 
-
-        // add a scene layer for buildings - Located in Berst France
-        final String buildings = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Brest/SceneServer/layers/0";
-        ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer(buildings);
-        scene.getOperationalLayers().add(sceneLayer);
-
-        // Elevation Layer
-        ArcGISTiledElevationSource elevationSource = new ArcGISTiledElevationSource("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer");
-        Surface surface = new Surface();
-        surface.getElevationSources().add(elevationSource);
-        scene.setBaseSurface(surface);
-
-
-        // Sockets implementation
-        //create a new thread
+        // Sockets implementation and create a new thread
         new Thread(() -> {
             try {
                 // Create a server socket
@@ -168,6 +170,7 @@ public class App extends Application {
             }
         }).start();
         moveUser(user); //Add user and its point
+
 
         Label FOV = new Label("Show Field Of View");
         FOVToggle = new ToggleButton("Show FOV");
@@ -255,7 +258,7 @@ public class App extends Application {
         polylinesToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(polylinesToggle.isSelected()) );
         polylinesToggle.textProperty().bind(Bindings.createStringBinding(() -> polylinesToggle.isSelected() ? "ON" : "OFF", polylinesToggle.selectedProperty()));
 
-        FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(FOVToggle.isSelected()) );
+        FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(!FOVToggle.isSelected()) );
         FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
 
 
@@ -287,7 +290,7 @@ public class App extends Application {
                     try {
                         Point point = pointFuture.get();
                         PointBuilder pointBuilder = new PointBuilder(point);
-                        pointBuilder.setZ(point.getZ());
+                        pointBuilder.setZ(point.getZ() + 50);
                         userViewshed.setLocation(pointBuilder.toGeometry());
                         // add listener back
                         user = point;
@@ -422,8 +425,18 @@ public class App extends Application {
         SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
         SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
         userMarkerSymbol.setOutline(blueOutlineSymbol);
-        // create a graphic with the point zgeometry and symbol
+
+
         Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
+
+//        Ask customer if they'd like a cone or not
+        // create a graphic with the point geometry and symbol
+        // create a viewshed to attach to the tank
+//        GeoElementViewshed geoElementViewshed = new GeoElementViewshed(pointGraphic,90.0, 40.0, 0.1, 250.0, 0.0, 0.0);
+//        // offset viewshed observer location to top of tank
+//        geoElementViewshed.setOffsetZ(3.0);
+//        analysisOverlayw.getAnalyses().add(geoElementViewshed);
+
         updateUserText();
         userPosition.getGraphics().add(pointGraphic);
     }
@@ -434,17 +447,15 @@ public class App extends Application {
                 .mapToDouble (Double::parseDouble)
                 .toArray();
 
-        user = new Point(arr[0], arr[1],arr[2]);
-        Point viewSpot = new Point(arr[3], arr[4],arr[5]);
+        user = new Point(arr[0], arr[1] , arr[2], SpatialReferences.getWgs84());
+        Point viewSpot = new Point(arr[3], arr[4],arr[5], SpatialReferences.getWgs84());
 
         moveUser(user);
         updateUserText();
 
         PointBuilder pointBuilder = new PointBuilder(user);
-        pointBuilder.setZ(user.getZ() + 100);
-        userViewshed.setLocation(user);
-
-
+        pointBuilder.setZ(user.getZ() + 50);
+        userViewshed.setLocation(pointBuilder.toGeometry());
         pointLists.add(viewSpot);
         addPoint(viewSpot, graphicsOverlay, pointVisualList);
         drawPolylines(pointLists, polygonLayer);
@@ -462,7 +473,6 @@ public class App extends Application {
         Camera camera = new Camera(user, 500.0, 10.0, 60.0, 0.0);
         sceneView.setViewpointCamera(camera);
     }
-
 
     /**
      * Stops and releases all resources used in application.
