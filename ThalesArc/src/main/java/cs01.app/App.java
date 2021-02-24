@@ -40,6 +40,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
@@ -290,7 +291,7 @@ public class App extends Application {
                     try {
                         Point point = pointFuture.get();
                         PointBuilder pointBuilder = new PointBuilder(point);
-                        pointBuilder.setZ(point.getZ() + 50);
+                        pointBuilder.setZ(point.getZ());
                         userViewshed.setLocation(pointBuilder.toGeometry());
                         // add listener back
                         user = point;
@@ -356,6 +357,14 @@ public class App extends Application {
         primaryStage.setScene(scenes);
         primaryStage.setMaximized(true);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent t) {
+                Platform.exit();
+                System.exit(0);
+            }
+        });
     }
 
     public void showLineOfSight(Point user, ArrayList<Point> pointLists){
@@ -454,7 +463,7 @@ public class App extends Application {
         updateUserText();
 
         PointBuilder pointBuilder = new PointBuilder(user);
-        pointBuilder.setZ(user.getZ() + 50);
+        pointBuilder.setZ(user.getZ());
         userViewshed.setLocation(pointBuilder.toGeometry());
         pointLists.add(viewSpot);
         addPoint(viewSpot, graphicsOverlay, pointVisualList);

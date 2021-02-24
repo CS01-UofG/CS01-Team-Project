@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb927452-3035-4750-88bc-5a70d5477bd7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,25 +85,40 @@
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state x="740" y="241" key="FileChooserDialogImpl/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614167943103" />
-    <state width="1877" height="284" key="GridCell.Tab.0.bottom" timestamp="1614168215415">
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom" timestamp="1614172556536">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.bottom/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614168215415" />
-    <state width="1877" height="284" key="GridCell.Tab.0.center" timestamp="1614168215415">
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614172556536" />
+    <state width="1877" height="284" key="GridCell.Tab.0.center" timestamp="1614172556536">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.center/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614168215415" />
-    <state width="1877" height="284" key="GridCell.Tab.0.left" timestamp="1614168215415">
+    <state width="1877" height="284" key="GridCell.Tab.0.center/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614172556536" />
+    <state width="1877" height="284" key="GridCell.Tab.0.left" timestamp="1614172556536">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.left/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614168215415" />
-    <state width="1877" height="284" key="GridCell.Tab.0.right" timestamp="1614168215415">
+    <state width="1877" height="284" key="GridCell.Tab.0.left/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614172556536" />
+    <state width="1877" height="284" key="GridCell.Tab.0.right" timestamp="1614172556536">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.right/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614168215415" />
+    <state width="1877" height="284" key="GridCell.Tab.0.right/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614172556536" />
     <state x="440" y="98" key="SettingsEditor" timestamp="1614168050448">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state x="440" y="98" key="SettingsEditor/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614168050448" />
+    <state x="552" y="257" key="Vcs.Push.Dialog.v2" timestamp="1614170555346">
+      <screen x="0" y="0" width="1920" height="1048" />
+    </state>
+    <state x="552" y="257" key="Vcs.Push.Dialog.v2/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614170555346" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/cs01.app/App.java</url>
+          <line>76</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
