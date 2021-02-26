@@ -23,6 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb927452-3035-4750-88bc-5a70d5477bd7" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

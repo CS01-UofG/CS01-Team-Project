@@ -280,7 +280,7 @@ public class App extends Application {
         // set the color and show the frustum outline
         Viewshed.setFrustumOutlineColor(0xCC0000FF);
         userViewshed.setFrustumOutlineVisible(true);
-        
+
         // toggle visibility
         visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
         visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
