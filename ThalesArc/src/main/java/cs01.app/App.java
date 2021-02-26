@@ -280,45 +280,7 @@ public class App extends Application {
         // set the color and show the frustum outline
         Viewshed.setFrustumOutlineColor(0xCC0000FF);
         userViewshed.setFrustumOutlineVisible(true);
-
-        // create a listener to update the viewshed location when the mouse moves
-        EventHandler<MouseEvent> mouseMoveEventHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                var point2D = new Point2D(event.getX(), event.getY());
-                ListenableFuture<Point> pointFuture = sceneView.screenToLocationAsync(point2D);
-                pointFuture.addDoneListener(() -> {
-                    try {
-                        Point point = pointFuture.get();
-                        PointBuilder pointBuilder = new PointBuilder(point);
-                        pointBuilder.setZ(point.getZ());
-                        userViewshed.setLocation(pointBuilder.toGeometry());
-                        // add listener back
-                        user = point;
-                        moveUser(user);
-                        sceneView.setOnMouseMoved(this);
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                });
-                // disable listener until location is updated (for performance)
-                sceneView.setOnMouseMoved(null);
-            }
-        };
-        // remove the default listener for mouse move events
-        sceneView.setOnMouseMoved(null);
-
-        // click to start/stop moving viewshed with mouse
-        sceneView.setOnMouseClicked(event -> {
-            if (event.isStillSincePress() && event.getButton() == MouseButton.PRIMARY) {
-                if (sceneView.getOnMouseMoved() == null) {
-                    sceneView.setOnMouseMoved(mouseMoveEventHandler);
-                } else {
-                    sceneView.setOnMouseMoved(null);
-                }
-            }
-        });
-
+        
         // toggle visibility
         visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
         visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
