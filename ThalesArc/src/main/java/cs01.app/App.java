@@ -1,46 +1,41 @@
 package cs01.app;
 
-import java.io.*;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
-
-import com.esri.arcgisruntime.concurrent.ListenableFuture;
-import com.esri.arcgisruntime.data.ServiceFeatureTable;
-import com.esri.arcgisruntime.geoanalysis.GeoElementViewshed;
-import com.esri.arcgisruntime.geoanalysis.LocationLineOfSight;
-import com.esri.arcgisruntime.geometry.*;
-import com.esri.arcgisruntime.layers.FeatureLayer;
-import com.esri.arcgisruntime.mapping.view.*;
-import com.esri.arcgisruntime.symbology.*;
+import com.alibaba.fastjson.JSON;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
+import com.esri.arcgisruntime.geoanalysis.LocationLineOfSight;
 import com.esri.arcgisruntime.geoanalysis.LocationViewshed;
-import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
-import javafx.beans.binding.Bindings;
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleButton;
-
 import com.esri.arcgisruntime.geoanalysis.Viewshed;
+import com.esri.arcgisruntime.geometry.*;
+import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
 import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.Surface;
+import com.esri.arcgisruntime.mapping.view.*;
+import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.stream.Stream;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
@@ -48,8 +43,8 @@ public class App extends Application {
     TextField userTextField = new TextField();
     private LocationViewshed userViewshed;
 
-    private GraphicsOverlay userPosition;
-    private GraphicsOverlay graphicsOverlay;
+    private GraphicsOverlay userOverlay;
+    private GraphicsOverlay pointsOverlay;
     private GraphicsOverlay polygonLayer;
     private AnalysisOverlay fovOverlay;
     private SceneView sceneView;
@@ -121,22 +116,20 @@ public class App extends Application {
         sceneView.getAnalysisOverlays().add(viewshedOverlay);
 
         // create a graphics overlay and add it to the map view for points and more
-        userPosition = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-        userPosition.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
-        sceneView.getGraphicsOverlays().add(userPosition);
+        userOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        userOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.ABSOLUTE);
+        sceneView.getGraphicsOverlays().add(userOverlay);
 
         // create a graphics overlay and add it to the map view for points and more
-        graphicsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-        graphicsOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
-        sceneView.getGraphicsOverlays().add(graphicsOverlay);
+        pointsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        pointsOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
+        sceneView.getGraphicsOverlays().add(pointsOverlay);
         // create a graphics overlay and add polylines to it and set to false
         polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
-        // Initialize user point
-        user = new Point( -4.484419007880914, 48.39127111485687, 50, SpatialReferences.getWgs84());
-        updateCameraPosition();
+        setInitialViewPoint(-4.484419007880914, 48.39127111485687);
 
         // Sockets implementation and create a new thread
         new Thread(() -> {
@@ -161,8 +154,8 @@ public class App extends Application {
                     System.out.println("received: " + fromClient);
 
                     Platform.runLater(() -> {
-
-                        parseData(fromClient);
+                        readJSON(fromClient);
+//                        parseData(fromClient);
 
                     });
                 }
@@ -170,7 +163,7 @@ public class App extends Application {
                 leftBox.getChildren().add(new Text(ex.toString()));
             }
         }).start();
-        moveUser(user); //Add user and its point
+//        moveUser(user); //Add user and its point
 
 
         Label FOV = new Label("Show Field Of View");
@@ -271,35 +264,35 @@ public class App extends Application {
 
 
         // create a userViewshed from the camera
-        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
-                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
-                maxDistanceSlider.getValue());
-        // set the colors of the visible and obstructed areas
-        Viewshed.setVisibleColor(0xCC00FF00);
-        Viewshed.setObstructedColor(0xCCFF0000);
-        // set the color and show the frustum outline
-        Viewshed.setFrustumOutlineColor(0xCC0000FF);
-        userViewshed.setFrustumOutlineVisible(true);
+//        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
+//                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
+//                maxDistanceSlider.getValue());
+//        // set the colors of the visible and obstructed areas
+//        Viewshed.setVisibleColor(0xCC00FF00);
+//        Viewshed.setObstructedColor(0xCCFF0000);
+//        // set the color and show the frustum outline
+//        Viewshed.setFrustumOutlineColor(0xCC0000FF);
+//        userViewshed.setFrustumOutlineVisible(true);
 
         // toggle visibility
-        visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
-        visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
-        frustumToggle.selectedProperty().addListener(e -> userViewshed.setFrustumOutlineVisible(!frustumToggle.isSelected()));
-        frustumToggle.textProperty().bind(Bindings.createStringBinding(() -> frustumToggle.isSelected() ? "OFF" : "ON", frustumToggle.selectedProperty()));
-        // heading slider
-        headingSlider.valueProperty().addListener(e -> userViewshed.setHeading(headingSlider.getValue()));
-        // pitch slider
-        pitchSlider.valueProperty().addListener(e -> userViewshed.setPitch(pitchSlider.getValue()));
-        // horizontal angle slider
-        horizontalAngleSlider.valueProperty().addListener(e -> userViewshed.setHorizontalAngle(horizontalAngleSlider.getValue()));
-        // vertical angle slider
-        verticalAngleSlider.valueProperty().addListener(e -> userViewshed.setVerticalAngle(verticalAngleSlider.getValue()));
-        // distance sliders
-        minDistanceSlider.valueProperty().addListener(e -> userViewshed.setMinDistance(minDistanceSlider.getValue()));
-        maxDistanceSlider.valueProperty().addListener(e -> userViewshed.setMaxDistance(maxDistanceSlider.getValue()));
-        // create an analysis overlay to add the userViewshed to the scene view
+//        visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
+//        visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
+//        frustumToggle.selectedProperty().addListener(e -> userViewshed.setFrustumOutlineVisible(!frustumToggle.isSelected()));
+//        frustumToggle.textProperty().bind(Bindings.createStringBinding(() -> frustumToggle.isSelected() ? "OFF" : "ON", frustumToggle.selectedProperty()));
+//        // heading slider
+//        headingSlider.valueProperty().addListener(e -> userViewshed.setHeading(headingSlider.getValue()));
+//        // pitch slider
+//        pitchSlider.valueProperty().addListener(e -> userViewshed.setPitch(pitchSlider.getValue()));
+//        // horizontal angle slider
+//        horizontalAngleSlider.valueProperty().addListener(e -> userViewshed.setHorizontalAngle(horizontalAngleSlider.getValue()));
+//        // vertical angle slider
+//        verticalAngleSlider.valueProperty().addListener(e -> userViewshed.setVerticalAngle(verticalAngleSlider.getValue()));
+//        // distance sliders
+//        minDistanceSlider.valueProperty().addListener(e -> userViewshed.setMinDistance(minDistanceSlider.getValue()));
+//        maxDistanceSlider.valueProperty().addListener(e -> userViewshed.setMaxDistance(maxDistanceSlider.getValue()));
+//        // create an analysis overlay to add the userViewshed to the scene view
 
-        viewshedOverlay.getAnalyses().add(userViewshed);
+//        viewshedOverlay.getAnalyses().add(userViewshed);
 
 
         SplitPane mainSplit = new SplitPane();
@@ -345,7 +338,7 @@ public class App extends Application {
     }
 
     //  Given a point it can add it to the map
-    public void addPoint(Point point, GraphicsOverlay graphicsOverlay, ListView<Text> list){
+    public void addPoint(Double Longitude, Double Latitude, Double Z, GraphicsOverlay pointsOverlay){
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol simpleMarkerSymbol =
                 new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFF5733, 10);
@@ -353,12 +346,15 @@ public class App extends Application {
                 new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
 
         simpleMarkerSymbol.setOutline(blueOutlineSymbol);
+
+        Point viewSpot = new Point(Longitude, Latitude, Z, SpatialReferences.getWgs84());
+
         // create a graphic with the point zgeometry and symbol
-        Graphic pointGraphic = new Graphic(point, simpleMarkerSymbol);
+        Graphic pointGraphic = new Graphic(viewSpot, simpleMarkerSymbol);
 
         // add the point graphic to the graphics overlay
-        graphicsOverlay.getGraphics().add(pointGraphic);
-        list.getItems().add( new Text("Point located at: " +  point.toString()));
+        pointsOverlay.getGraphics().add(pointGraphic);
+        pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.toString()));
 
     }
     //Given two points it can add it to the map
@@ -391,7 +387,8 @@ public class App extends Application {
     public void moveUser(Point newLocation) {
 
         showLineOfSight(user, pointLists);
-        userPosition.getGraphics().clear();
+        userOverlay.getGraphics().clear();
+
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
         SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
@@ -400,16 +397,8 @@ public class App extends Application {
 
         Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
 
-//        Ask customer if they'd like a cone or not
-        // create a graphic with the point geometry and symbol
-        // create a viewshed to attach to the tank
-//        GeoElementViewshed geoElementViewshed = new GeoElementViewshed(pointGraphic,90.0, 40.0, 0.1, 250.0, 0.0, 0.0);
-//        // offset viewshed observer location to top of tank
-//        geoElementViewshed.setOffsetZ(3.0);
-//        analysisOverlayw.getAnalyses().add(geoElementViewshed);
-
         updateUserText();
-        userPosition.getGraphics().add(pointGraphic);
+        userOverlay.getGraphics().add(pointGraphic);
     }
 
     // Parses data and adds points and polylines in format of User:xyz, Point: xyz -> xyz,xyz
@@ -428,9 +417,62 @@ public class App extends Application {
         pointBuilder.setZ(user.getZ());
         userViewshed.setLocation(pointBuilder.toGeometry());
         pointLists.add(viewSpot);
-        addPoint(viewSpot, graphicsOverlay, pointVisualList);
+//        addPoint(arr[3], arr[4], arr[5]);
         drawPolylines(pointLists, polygonLayer);
     }
+
+    
+    public void readJSON(String data){
+        Sensor sensor = JSON.parseObject(data,Sensor.class);
+
+        // Add user and move user
+        user = new Point(sensor.sensor_latitude, sensor.sensor_longitude, sensor.sensor_elevation, SpatialReferences.getWgs84());
+        moveUser(user);
+        updateUserText();
+
+        //add point user is looking at
+        addPoint(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude, pointsOverlay );
+
+
+        PointBuilder pointBuilder = new PointBuilder(user);
+        pointBuilder.setZ(sensor.sensor_elevation);
+
+        if (userViewshed == null){
+            addViewshed();
+        }
+
+
+        userViewshed.setLocation(pointBuilder.toGeometry());
+        updateCameraPosition();
+        userViewshed.setHeading(sensor.sensor_azimuth);
+//        userViewshed.setPitch(sensor.sensor_altitude);
+
+    }
+
+    public void addViewshed(){
+
+        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
+                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
+                maxDistanceSlider.getValue());
+        // set the colors of the visible and obstructed areas
+        Viewshed.setVisibleColor(0xCC00FF00);
+        Viewshed.setObstructedColor(0xCCFF0000);
+        // set the color and show the frustum outline
+        Viewshed.setFrustumOutlineColor(0xCC0000FF);
+        userViewshed.setFrustumOutlineVisible(true);
+
+        viewshedOverlay.getAnalyses().add(userViewshed);
+
+    }
+
+    public void setInitialViewPoint(double longitude, double latitude){
+        Point viewpoint = new Point(longitude, latitude);
+        Camera camera = new Camera(viewpoint, 5000.0, 10.0, 60.0, 0.0);
+
+        // set the map views's viewpoint centered on Waterloo and scaled
+        sceneView.setViewpointCamera(camera);
+    }
+
 
     // Updates the user location in text bar
     public void updateUserText(){
