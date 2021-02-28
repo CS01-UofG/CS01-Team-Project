@@ -122,7 +122,7 @@ public class App extends Application {
 
         // create a graphics overlay and add it to the map view for points and more
         pointsOverlay = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
-        pointsOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.RELATIVE);
+        pointsOverlay.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.ABSOLUTE);
         sceneView.getGraphicsOverlays().add(pointsOverlay);
         // create a graphics overlay and add polylines to it and set to false
         polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
@@ -155,8 +155,6 @@ public class App extends Application {
 
                     Platform.runLater(() -> {
                         readJSON(fromClient);
-//                        parseData(fromClient);
-
                     });
                 }
             } catch (IOException ex) {
@@ -348,10 +346,9 @@ public class App extends Application {
         simpleMarkerSymbol.setOutline(blueOutlineSymbol);
 
         Point viewSpot = new Point(Longitude, Latitude, Z, SpatialReferences.getWgs84());
-
+        pointLists.add(viewSpot);
         // create a graphic with the point zgeometry and symbol
         Graphic pointGraphic = new Graphic(viewSpot, simpleMarkerSymbol);
-
         // add the point graphic to the graphics overlay
         pointsOverlay.getGraphics().add(pointGraphic);
         pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.toString()));
@@ -386,7 +383,7 @@ public class App extends Application {
     // Moves the user and fov cone to a new location
     public void moveUser(Point newLocation) {
 
-        showLineOfSight(user, pointLists);
+//        showLineOfSight(user, pointLists);
         userOverlay.getGraphics().clear();
 
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
@@ -401,27 +398,7 @@ public class App extends Application {
         userOverlay.getGraphics().add(pointGraphic);
     }
 
-    // Parses data and adds points and polylines in format of User:xyz, Point: xyz -> xyz,xyz
-    public void parseData(String data){
-        double[] arr = Stream.of(data.split(","))
-                .mapToDouble (Double::parseDouble)
-                .toArray();
-
-        user = new Point(arr[0], arr[1] , arr[2], SpatialReferences.getWgs84());
-        Point viewSpot = new Point(arr[3], arr[4],arr[5], SpatialReferences.getWgs84());
-
-        moveUser(user);
-        updateUserText();
-
-        PointBuilder pointBuilder = new PointBuilder(user);
-        pointBuilder.setZ(user.getZ());
-        userViewshed.setLocation(pointBuilder.toGeometry());
-        pointLists.add(viewSpot);
-//        addPoint(arr[3], arr[4], arr[5]);
-        drawPolylines(pointLists, polygonLayer);
-    }
-
-    
+    // Adds data through JSON
     public void readJSON(String data){
         Sensor sensor = JSON.parseObject(data,Sensor.class);
 
@@ -431,9 +408,7 @@ public class App extends Application {
         updateUserText();
 
         //add point user is looking at
-        addPoint(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude, pointsOverlay );
-
-
+        addPoint(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude, pointsOverlay);
         PointBuilder pointBuilder = new PointBuilder(user);
         pointBuilder.setZ(sensor.sensor_elevation);
 
@@ -444,7 +419,11 @@ public class App extends Application {
 
         userViewshed.setLocation(pointBuilder.toGeometry());
         updateCameraPosition();
-        userViewshed.setHeading(sensor.sensor_azimuth);
+
+        //Bearing needs to be calculated from the north
+        userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
+        userViewshed.setMaxDistance(sensor.target_range);
+        drawPolylines(pointLists, polygonLayer);
 //        userViewshed.setPitch(sensor.sensor_altitude);
 
     }
@@ -462,7 +441,6 @@ public class App extends Application {
         userViewshed.setFrustumOutlineVisible(true);
 
         viewshedOverlay.getAnalyses().add(userViewshed);
-
     }
 
     public void setInitialViewPoint(double longitude, double latitude){
