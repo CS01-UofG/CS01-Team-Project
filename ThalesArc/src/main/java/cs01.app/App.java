@@ -598,9 +598,8 @@ public class App extends Application {
             File newFile = new File(pathname);
             if (newFile.createNewFile()) {
                 logfile = newFile;
-                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-                a.setContentText("File created: " + newFile.getName());
-                a.show();
+                throwConfirmationAlert("File created: " + newFile.getName());
+
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
@@ -629,41 +628,7 @@ public class App extends Application {
         a.setContentText(message);
         a.show();
     }
-
-
-//    // Appends data to a file.
-//    public void appendFile() throws IOException {
-//        Boolean sucess = false;
-//        try {
-//            if (logfile == null){
-//                // create a alert
-//                Alert a = new Alert(Alert.AlertType.NONE);
-//                a.setAlertType(Alert.AlertType.ERROR);      // set content text
-//                a.setContentText("No selected Log file, create new or open.");
-//                a.show();
-//            } else {
-//                FileWriter fr = new FileWriter(logfile, true);
-//                for (Sensor data: sensorData){
-//                    String json = JSON.toJSONString(data);
-//                    fr.write('\n' + json );
-//                }
-//                sucess = true;
-//                fr.close();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (sucess) {
-//                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-//                a.setContentText("Saved to log file");
-//                a.show();
-//            }
-//        }
-//    }
-
-
-
-
+    
     /**
      * Stops and releases all resources used in application.
      */
