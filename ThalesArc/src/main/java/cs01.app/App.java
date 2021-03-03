@@ -93,7 +93,7 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IOException {
         String yourApiKey = "AAPKb67d305991d24fa89d69e310a58fa1f8xryw7mKYrKOZF9_A49GmTH_Bqj9GSEiAxI9Rv6Uqdj3ProCQ-S1D1dpYNNhW4mjk";
         ArcGISRuntimeEnvironment.setApiKey(yourApiKey);
 
@@ -170,10 +170,21 @@ public class App extends Application {
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent actionEvent) {
+                        Boolean sucess = false;
                         try {
-                            appendFile();
+                            if (logfile == null) {
+                                // create an alert
+                                throwErrorAlert("No selected Log file, create new or open.");
+                            } else {
+                                appendFile();
+                                sucess = true;
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
+                        } finally{
+                            if (sucess) {
+                                throwConfirmationAlert("Saved to log file");
+                            }
                         }
                     }
                 }
@@ -599,34 +610,58 @@ public class App extends Application {
     }
     // Appends data to a file.
     public void appendFile() throws IOException {
-        Boolean sucess = false;
-        try {
-            if (logfile == null){
-                // create a alert
-                Alert a = new Alert(Alert.AlertType.NONE);
-                a.setAlertType(Alert.AlertType.ERROR);      // set content text
-                a.setContentText("No selected Log file, create new or open.");
-                a.show();
-            } else {
-                FileWriter fr = new FileWriter(logfile, true);
-                for (Sensor data: sensorData){
-                    String json = JSON.toJSONString(data);
-                    fr.write('\n' + json );
-                }
-                sucess = true;
-                fr.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (sucess) {
-                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-                a.setContentText("Saved to log file");
-                a.show();
-            }
+        FileWriter fr = new FileWriter(logfile, true);
+        for (Sensor data: sensorData){
+            String json = JSON.toJSONString(data);
+            fr.write('\n' + json );
         }
-
+        fr.close();
     }
+
+    public void throwErrorAlert(String message){
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setContentText(message);
+        a.show();
+    }
+
+    public void throwConfirmationAlert(String message){
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setContentText(message);
+        a.show();
+    }
+
+
+//    // Appends data to a file.
+//    public void appendFile() throws IOException {
+//        Boolean sucess = false;
+//        try {
+//            if (logfile == null){
+//                // create a alert
+//                Alert a = new Alert(Alert.AlertType.NONE);
+//                a.setAlertType(Alert.AlertType.ERROR);      // set content text
+//                a.setContentText("No selected Log file, create new or open.");
+//                a.show();
+//            } else {
+//                FileWriter fr = new FileWriter(logfile, true);
+//                for (Sensor data: sensorData){
+//                    String json = JSON.toJSONString(data);
+//                    fr.write('\n' + json );
+//                }
+//                sucess = true;
+//                fr.close();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (sucess) {
+//                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+//                a.setContentText("Saved to log file");
+//                a.show();
+//            }
+//        }
+//    }
+
+
 
 
     /**
@@ -640,3 +675,5 @@ public class App extends Application {
         }
     }
 }
+
+
