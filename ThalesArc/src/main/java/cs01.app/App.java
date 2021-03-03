@@ -6,6 +6,7 @@ import com.esri.arcgisruntime.geoanalysis.LocationLineOfSight;
 import com.esri.arcgisruntime.geoanalysis.LocationViewshed;
 import com.esri.arcgisruntime.geoanalysis.Viewshed;
 import com.esri.arcgisruntime.geometry.*;
+import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
 import com.esri.arcgisruntime.mapping.ArcGISScene;
 import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
@@ -18,30 +19,37 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.*;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.stream.Stream;
+import java.util.Scanner;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
     private Point user;
     TextField userTextField = new TextField();
     private LocationViewshed userViewshed;
+
+    private Desktop desktop = Desktop.getDesktop();
+    private File logfile;
 
     private GraphicsOverlay userOverlay;
     private GraphicsOverlay pointsOverlay;
@@ -59,6 +67,10 @@ public class App extends Application {
     private ToggleButton polylinesToggle;
     private ToggleButton visibilityToggle;
     private ToggleButton frustumToggle;
+
+
+    private Button openFileButton;
+    private Button createFileButton;
 
     private Button cameraButton;
     private Slider headingSlider;
@@ -129,7 +141,36 @@ public class App extends Application {
         sceneView.getGraphicsOverlays().add(polygonLayer);
         polygonLayer.setVisible(false);
 
+        // Hardcoded to Brest France
         setInitialViewPoint(-4.484419007880914, 48.39127111485687);
+
+
+        // Settings for Filestorage
+        createFileButton = new Button("Create a log file");
+        createFileButton.setOnAction(
+            new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    createFile();
+                }
+            }
+        );
+
+        openFileButton = new Button("Open a JSON File");
+        final FileChooser fileChooser = new FileChooser();
+        openFileButton.setOnAction(
+            new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+                    configureFileChooser(fileChooser);
+                    File file = fileChooser.showOpenDialog(primaryStage);
+                    if (file != null) {
+                        openFile(file);
+                    }
+                }
+        });
+
+        leftBox.getChildren().addAll(createFileButton,openFileButton);
 
         // Sockets implementation and create a new thread
         new Thread(() -> {
@@ -161,8 +202,6 @@ public class App extends Application {
                 leftBox.getChildren().add(new Text(ex.toString()));
             }
         }).start();
-//        moveUser(user); //Add user and its point
-
 
         Label FOV = new Label("Show Field Of View");
         FOVToggle = new ToggleButton("Show FOV");
@@ -464,6 +503,76 @@ public class App extends Application {
         Camera camera = new Camera(user, 500.0, 10.0, 60.0, 0.0);
         sceneView.setViewpointCamera(camera);
     }
+
+    // Read / Load And Write files
+    public static void configureFileChooser(
+        final FileChooser fileChooser) {
+            fileChooser.setTitle("Load JSON");
+            fileChooser.setInitialDirectory(
+                    new File(System.getProperty("user.dir"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON", "*.JSON"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+
+        );
+    }
+    // Gets working directory set at JSONLogs
+    public String getLogDir(){
+        String currentUserDir = System.getProperty("user.dir");
+        return currentUserDir + File.separator + "JSONLogs";
+    }
+    // Gets filecount
+    public int fileCount(String filename){
+        File file = new File(filename);
+        // Populates the array with names of files and directories
+        return file.list().length;
+    }
+    //Lets user open file and input data throught JSONLogs
+    public void openFile(File file) {
+        try {
+            logfile = file;
+            readFile(file);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+    }
+    //Read file functionality
+    public void readFile(File file) throws FileNotFoundException {
+        Scanner scanner = new Scanner(file);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            // process the line
+            System.out.println(line);
+            readJSON(line);
+        }
+    }
+    //Lets user create a new log file
+    public void createFile(){
+        int fileCount = fileCount(getLogDir()) + 1;
+        try {
+            String pathname = getLogDir() + File.separator +"log" + fileCount + ".json";
+            File newFile = new File(pathname);
+            if (newFile.createNewFile()) {
+                logfile = newFile;
+                System.out.println("File created: " + newFile.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+    // lets the user write to a file
+    public void writeFile(File file){
+
+    }
+
+    public void appendFile(File file){
+
+    }
+
 
     /**
      * Stops and releases all resources used in application.
