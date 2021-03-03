@@ -1,3 +1,2 @@
-{"sensor_latitude": -4.470419007880913, "sensor_longitude": 48.40052049959363, "sensor_altitude": 60.0, "sensor_azimuth": 175.08059704740157, "sensor_elevation": 100.0, "target_latitude": -4.470616978397432, "target_longitude": 48.39985213640647, "target_altitude": 130.0, "target_range": 100.0}
 
-{"sensor_latitude": -4.470419007880913, "sensor_longitude": 48.40052049959363, "sensor_altitude": 80.0, "sensor_azimuth": 175.08059704740157, "sensor_elevation": 100.0, "target_latitude": -4.470616978397432, "target_longitude": 48.39985213640647, "target_altitude": 130.0, "target_range": 100.0}
+{"id":0,"sensor_altitude":60.0,"sensor_azimuth":172.5521729364082,"sensor_elevation":100.0,"sensor_latitude":-4.484419007880914,"sensor_longitude":48.39127111485687,"target_altitude":130.0,"target_latitude":-4.484553264600654,"target_longitude":48.39096396120281,"target_range":100.0}

@@ -1,7 +1,7 @@
 package cs01.app;
 
 public class Sensor {
-
+    public int id;
     public double sensor_latitude;
     public double sensor_longitude;
     public double sensor_altitude;
@@ -14,10 +14,10 @@ public class Sensor {
     public double target_range;
 
 
-    public Sensor(Double sensor_latitude, Double sensor_longitude, Double sensor_altitude, Double sensor_azimuth,
+    public Sensor(int id, Double sensor_latitude, Double sensor_longitude, Double sensor_altitude, Double sensor_azimuth,
                   Double sensor_elevation, Double target_latitude, Double target_longitude, Double target_altitude,
                   Double target_range){
-
+        this.id = id;
         this.sensor_latitude = sensor_latitude;
         this.sensor_longitude = sensor_longitude;
         this.sensor_altitude = sensor_altitude;

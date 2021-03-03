@@ -44,11 +44,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
-    private ArrayList<Sensor> SensorData = new ArrayList<Sensor>();
+    private ArrayList<Sensor> sensorData = new ArrayList<Sensor>();
 
     private Point user;
     TextField userTextField = new TextField();
@@ -170,7 +171,7 @@ public class App extends Application {
                     @Override
                     public void handle(ActionEvent actionEvent) {
                         try {
-                            appendFile("Hello");
+                            appendFile();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -383,7 +384,7 @@ public class App extends Application {
     
     //function to clear all layers and list
     public void clearAll(){
-
+        sensorData.clear();
     }
 
     public void showLineOfSight(Point user, ArrayList<Point> pointLists){
@@ -467,7 +468,9 @@ public class App extends Application {
     // Adds data through JSON
     public void readJSON(String data){
         Sensor sensor = JSON.parseObject(data,Sensor.class);
-
+        if (!sensorData.contains(sensor)){
+            sensorData.add(sensor);
+        }
         // Add user and move user
         user = new Point(sensor.sensor_latitude, sensor.sensor_longitude, sensor.sensor_elevation, SpatialReferences.getWgs84());
         moveUser(user);
@@ -552,7 +555,7 @@ public class App extends Application {
     public int fileCount(String filename){
         File file = new File(filename);
         // Populates the array with names of files and directories
-        return file.list().length;
+        return Objects.requireNonNull(file.list()).length;
     }
     //Lets user open file and input data throught JSONLogs
     public void openFile(File file) {
@@ -584,28 +587,45 @@ public class App extends Application {
             File newFile = new File(pathname);
             if (newFile.createNewFile()) {
                 logfile = newFile;
-                System.out.println("File created: " + newFile.getName());
-            } else {
-                System.out.println("File already exists.");
+                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+                a.setContentText("File created: " + newFile.getName());
+                a.show();
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
     }
     // Appends data to a file.
-    public void appendFile(String textToAppend) throws IOException {
-        if (logfile == null){
-            // create a alert
-            Alert a = new Alert(Alert.AlertType.NONE);
-            a.setAlertType(Alert.AlertType.ERROR);      // set content text
-            a.setContentText("No selected Log file, create new or open.");
-            a.show();
+    public void appendFile() throws IOException {
+        Boolean sucess = false;
+        try {
+            if (logfile == null){
+                // create a alert
+                Alert a = new Alert(Alert.AlertType.NONE);
+                a.setAlertType(Alert.AlertType.ERROR);      // set content text
+                a.setContentText("No selected Log file, create new or open.");
+                a.show();
+            } else {
+                FileWriter fr = new FileWriter(logfile, true);
+                for (Sensor data: sensorData){
+                    String json = JSON.toJSONString(data);
+                    fr.write('\n' + json );
+                }
+                sucess = true;
+                fr.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (sucess) {
+                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+                a.setContentText("Saved to log file");
+                a.show();
+            }
         }
-        FileWriter fr = new FileWriter(logfile, true);
-        System.out.println("Appended to file");
-        fr.write('\n' + textToAppend );
-        fr.close();
+
     }
 
 
