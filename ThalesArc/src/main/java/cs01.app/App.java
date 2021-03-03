@@ -39,11 +39,17 @@ import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
+    private ArrayList<Sensor> SensorData = new ArrayList<Sensor>();
+
     private Point user;
     TextField userTextField = new TextField();
     private LocationViewshed userViewshed;
@@ -71,6 +77,7 @@ public class App extends Application {
 
     private Button openFileButton;
     private Button createFileButton;
+    private Button addLogs;
 
     private Button cameraButton;
     private Slider headingSlider;
@@ -156,6 +163,21 @@ public class App extends Application {
             }
         );
 
+        // Settings for Filestorage
+        addLogs = new Button("Save to log file");
+        addLogs.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        try {
+                            appendFile("Hello");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
+
         openFileButton = new Button("Open a JSON File");
         final FileChooser fileChooser = new FileChooser();
         openFileButton.setOnAction(
@@ -170,7 +192,7 @@ public class App extends Application {
                 }
         });
 
-        leftBox.getChildren().addAll(createFileButton,openFileButton);
+        leftBox.getChildren().addAll(createFileButton,openFileButton, addLogs);
 
         // Sockets implementation and create a new thread
         new Thread(() -> {
@@ -358,6 +380,11 @@ public class App extends Application {
             }
         });
     }
+    
+    //function to clear all layers and list
+    public void clearAll(){
+
+    }
 
     public void showLineOfSight(Point user, ArrayList<Point> pointLists){
         int len = pointLists.size();
@@ -490,7 +517,6 @@ public class App extends Application {
         sceneView.setViewpointCamera(camera);
     }
 
-
     // Updates the user location in text bar
     public void updateUserText(){
         double x = user.getX();
@@ -543,8 +569,11 @@ public class App extends Application {
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             // process the line
-            System.out.println(line);
-            readJSON(line);
+            if (line.length() > 0) {
+                //do lots of stuff to sort the data into lists etc
+                System.out.println(line);
+                readJSON(line);
+            }
         }
     }
     //Lets user create a new log file
@@ -564,13 +593,19 @@ public class App extends Application {
             e.printStackTrace();
         }
     }
-    // lets the user write to a file
-    public void writeFile(File file){
-
-    }
-
-    public void appendFile(File file){
-
+    // Appends data to a file.
+    public void appendFile(String textToAppend) throws IOException {
+        if (logfile == null){
+            // create a alert
+            Alert a = new Alert(Alert.AlertType.NONE);
+            a.setAlertType(Alert.AlertType.ERROR);      // set content text
+            a.setContentText("No selected Log file, create new or open.");
+            a.show();
+        }
+        FileWriter fr = new FileWriter(logfile, true);
+        System.out.println("Appended to file");
+        fr.write('\n' + textToAppend );
+        fr.close();
     }
 
 
