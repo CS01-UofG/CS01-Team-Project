@@ -1,4 +1,5 @@
 package cs01.app;
+import cs01.ComponentFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
@@ -62,6 +63,7 @@ public class App extends Application {
     private GraphicsOverlay pointsOverlay;
     private GraphicsOverlay polygonLayer;
     private AnalysisOverlay fovOverlay;
+    private ComponentFactory componentFactory = new ComponentFactory();
     private SceneView sceneView;
     private AnalysisOverlay viewshedOverlay;
     public TitledPane options = new TitledPane();
@@ -246,70 +248,22 @@ public class App extends Application {
         frustumToggle = new ToggleButton("frustumToggle");
 
         Label headingLabel = new Label("Heading");
-        headingSlider = new Slider();
-        headingSlider.setMin(0);
-        headingSlider.setMax(360);
-        headingSlider.setValue(40);
-        headingSlider.setShowTickLabels(true);
-        headingSlider.setShowTickMarks(true);
-        headingSlider.setMajorTickUnit(20);
-        headingSlider.setMinorTickCount(5);
-        headingSlider.setBlockIncrement(1);
+        headingSlider = this.componentFactory.createSlider(0, 360, 40, 20, 5, 1);
 
         Label pitchLabel = new Label("Pitch Angle");
-        pitchSlider = new Slider();
-        pitchSlider.setMin(0);
-        pitchSlider.setMax(180);
-        pitchSlider.setValue(100);
-        pitchSlider.setShowTickLabels(true);
-        pitchSlider.setShowTickMarks(true);
-        pitchSlider.setMajorTickUnit(50);
-        pitchSlider.setMinorTickCount(5);
-        pitchSlider.setBlockIncrement(10);
+        pitchSlider = this.componentFactory.createSlider(0, 180, 100, 50, 5, 10);
 
         Label horizontalLabel = new Label("Horizontal Angle");
-        horizontalAngleSlider = new Slider();
-        horizontalAngleSlider.setMin(0);
-        horizontalAngleSlider.setMax(180);
-        horizontalAngleSlider.setValue(50);
-        horizontalAngleSlider.setShowTickLabels(true);
-        horizontalAngleSlider.setShowTickMarks(true);
-        horizontalAngleSlider.setMajorTickUnit(50);
-        horizontalAngleSlider.setMinorTickCount(5);
-        horizontalAngleSlider.setBlockIncrement(10);
+        horizontalAngleSlider = this.componentFactory.createSlider(0, 180, 50, 50, 5, 10);
 
         Label verticalAngle = new Label("Vertical Angle");
-        verticalAngleSlider = new Slider();
-        verticalAngleSlider.setMin(0);
-        verticalAngleSlider.setMax(180);
-        verticalAngleSlider.setValue(70);
-        verticalAngleSlider.setShowTickLabels(true);
-        verticalAngleSlider.setShowTickMarks(true);
-        verticalAngleSlider.setMajorTickUnit(50);
-        verticalAngleSlider.setMinorTickCount(5);
-        verticalAngleSlider.setBlockIncrement(10);
+        verticalAngleSlider = this.componentFactory.createSlider(0, 180, 70, 50, 5, 10);
 
         Label minDistance = new Label("Minimum Distance ");
-        minDistanceSlider = new Slider();
-        minDistanceSlider.setMin(0);
-        minDistanceSlider.setMax(100);
-        minDistanceSlider.setValue(05);
-        minDistanceSlider.setShowTickLabels(true);
-        minDistanceSlider.setShowTickMarks(true);
-        minDistanceSlider.setMajorTickUnit(50);
-        minDistanceSlider.setMinorTickCount(5);
-        minDistanceSlider.setBlockIncrement(10);
+        minDistanceSlider = this.componentFactory.createSlider(0, 100, 0, 50, 5, 10);
 
         Label maxDistance = new Label("Max Distance ");
-        maxDistanceSlider = new Slider();
-        maxDistanceSlider.setMin(0);
-        maxDistanceSlider.setMax(1000);
-        maxDistanceSlider.setValue(80);
-        maxDistanceSlider.setShowTickLabels(true);
-        maxDistanceSlider.setShowTickMarks(true);
-        maxDistanceSlider.setMajorTickUnit(50);
-        maxDistanceSlider.setMinorTickCount(5);
-        maxDistanceSlider.setBlockIncrement(10);
+        maxDistanceSlider = this.componentFactory.createSlider(0, 1000, 80, 50, 5, 10);
 
         // create a button to update the view
         cameraButton = new Button("Update camera");
@@ -397,6 +351,20 @@ public class App extends Application {
     public void clearAll(){
         sensorData.clear();
     }
+    
+//    public Slider createSlider(double min, double max, double value, double majorTickUnit, int minorTickCount, double blockIncrement){
+//        Slider slider = new Slider();
+//        slider.setMin(min);
+//        slider.setMax(max);
+//        slider.setValue(value);
+//        slider.setShowTickLabels(true);
+//        slider.setShowTickMarks(true);
+//        slider.setMajorTickUnit(majorTickUnit);
+//        slider.setMinorTickCount(minorTickCount);
+//        slider.setBlockIncrement(blockIncrement);
+//        
+//        return slider;
+//    }
 
     public void showLineOfSight(Point user, ArrayList<Point> pointLists){
         int len = pointLists.size();
