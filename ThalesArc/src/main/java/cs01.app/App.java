@@ -77,12 +77,13 @@ public class App extends Application {
     private ToggleButton visibilityToggle;
     private ToggleButton frustumToggle;
 
-
+    private Button createPolylines;
     private Button openFileButton;
     private Button createFileButton;
     private Button addLogs;
-
     private Button cameraButton;
+    private Button clearAllEntities;
+
     private Slider headingSlider;
     private Slider pitchSlider;
     private Slider horizontalAngleSlider;
@@ -148,12 +149,11 @@ public class App extends Application {
         sceneView.getGraphicsOverlays().add(pointsOverlay);
         // create a graphics overlay and add polylines to it and set to false
         polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
+        polygonLayer.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.ABSOLUTE);
         sceneView.getGraphicsOverlays().add(polygonLayer);
-        polygonLayer.setVisible(false);
 
         // Hardcoded to Brest France
         setInitialViewPoint(-4.484419007880914, 48.39127111485687);
-
 
         // Settings for Filestorage
         createFileButton = new Button("Create a log file");
@@ -165,7 +165,6 @@ public class App extends Application {
                 }
             }
         );
-
         // Settings for Filestorage
         addLogs = new Button("Save to log file");
         addLogs.setOnAction(
@@ -191,7 +190,7 @@ public class App extends Application {
                     }
                 }
         );
-
+        // Lets user open a file button
         openFileButton = new Button("Open a JSON File");
         final FileChooser fileChooser = new FileChooser();
         openFileButton.setOnAction(
@@ -205,8 +204,18 @@ public class App extends Application {
                     }
                 }
         });
+        // Lets the user clear all entites
+        clearAllEntities = new Button("Clear entites off map");
+        clearAllEntities.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        clearAll();
+                    }
+                }
+        );
 
-        leftBox.getChildren().addAll(createFileButton,openFileButton, addLogs);
+        leftBox.getChildren().addAll(userTextField, createFileButton,openFileButton, addLogs, clearAllEntities);
 
         // Sockets implementation and create a new thread
         new Thread(() -> {
@@ -225,7 +234,6 @@ public class App extends Application {
                     Socket socket = serverSocket.accept();
                     String fromClient;
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
 
                     fromClient = in.readLine();
                     System.out.println("received: " + fromClient);
@@ -269,7 +277,17 @@ public class App extends Application {
         cameraButton = new Button("Update camera");
         cameraButton.setOnMouseClicked(e -> updateCameraPosition());
 
-        leftBox.getChildren().addAll(userTextField, Polylines,polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        createPolylines = new Button("Create Polylines");
+        createPolylines.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        createPolylines();
+                    }
+                }
+        );
+
+        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
         centre.getChildren().addAll(sceneView, cameraButton);
         StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
 //        StackPane.setAlignment(FOVToggle, Pos.TOP_LEFT);
@@ -285,8 +303,6 @@ public class App extends Application {
         // set the user and camera
 
 //        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
-
-
 
         // create a userViewshed from the camera
 //        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
@@ -349,23 +365,21 @@ public class App extends Application {
     
     //function to clear all layers and list
     public void clearAll(){
-        sensorData.clear();
-    }
-    
-//    public Slider createSlider(double min, double max, double value, double majorTickUnit, int minorTickCount, double blockIncrement){
-//        Slider slider = new Slider();
-//        slider.setMin(min);
-//        slider.setMax(max);
-//        slider.setValue(value);
-//        slider.setShowTickLabels(true);
-//        slider.setShowTickMarks(true);
-//        slider.setMajorTickUnit(majorTickUnit);
-//        slider.setMinorTickCount(minorTickCount);
-//        slider.setBlockIncrement(blockIncrement);
-//        
-//        return slider;
-//    }
+        userOverlay.getGraphics().clear();
+        pointsOverlay.getGraphics().clear();
+        polygonLayer.getGraphics().clear();
 
+        fovOverlay.getInternal().dispose();
+        userViewshed.getInternal().dispose();
+
+        pointVisualList.getItems().clear();
+
+        sensorData.clear();
+        pointLists.clear();
+
+        throwConfirmationAlert("Cleared All Layers");
+    }
+    // Functions to draw and create line of sight
     public void showLineOfSight(Point user, ArrayList<Point> pointLists){
         int len = pointLists.size();
         fovOverlay.getAnalyses().clear();
@@ -374,6 +388,10 @@ public class App extends Application {
         }
     }
 
+    // Functions to draw and create polylines
+    public void createPolylines(){
+        drawPolylines(pointLists, polygonLayer);
+    }
     public void drawPolylines(ArrayList<Point> pointLists, GraphicsOverlay graphicsOverlay){
         int len = pointLists.size();
         for(int i=0;i<len - 1;i++) {
@@ -429,7 +447,6 @@ public class App extends Application {
     // Moves the user and fov cone to a new location
     public void moveUser(Point newLocation) {
 
-//        showLineOfSight(user, pointLists);
         userOverlay.getGraphics().clear();
 
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
@@ -444,9 +461,14 @@ public class App extends Application {
         userOverlay.getGraphics().add(pointGraphic);
     }
 
+    // function to return JSON object
+    public Sensor convertJSON(String data){
+        return JSON.parseObject(data,Sensor.class);
+    }
+
     // Adds data through JSON
     public void readJSON(String data){
-        Sensor sensor = JSON.parseObject(data,Sensor.class);
+        Sensor sensor = convertJSON(data);
         if (!sensorData.contains(sensor)){
             sensorData.add(sensor);
         }
@@ -464,14 +486,12 @@ public class App extends Application {
             addViewshed();
         }
 
-
         userViewshed.setLocation(pointBuilder.toGeometry());
         updateCameraPosition();
 
         //Bearing needs to be calculated from the north
         userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
         userViewshed.setMaxDistance(sensor.target_range);
-        drawPolylines(pointLists, polygonLayer);
 //        userViewshed.setPitch(sensor.sensor_altitude);
 
     }
