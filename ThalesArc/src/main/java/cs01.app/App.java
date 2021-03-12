@@ -1,4 +1,6 @@
 package cs01.app;
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.mapping.*;
 import cs01.ComponentFactory;
 
 import com.alibaba.fastjson.JSON;
@@ -9,10 +11,6 @@ import com.esri.arcgisruntime.geoanalysis.Viewshed;
 import com.esri.arcgisruntime.geometry.*;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.ArcGISSceneLayer;
-import com.esri.arcgisruntime.mapping.ArcGISScene;
-import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
-import com.esri.arcgisruntime.mapping.Basemap;
-import com.esri.arcgisruntime.mapping.Surface;
 import com.esri.arcgisruntime.mapping.view.*;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
@@ -23,12 +21,14 @@ import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -40,11 +40,9 @@ import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -90,6 +88,8 @@ public class App extends Application {
     private Slider verticalAngleSlider;
     private Slider minDistanceSlider;
     private Slider maxDistanceSlider;
+
+    private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -151,6 +151,13 @@ public class App extends Application {
         polygonLayer = new GraphicsOverlay(GraphicsOverlay.RenderingMode.DYNAMIC);
         polygonLayer.getSceneProperties().setSurfacePlacement(LayerSceneProperties.SurfacePlacement.ABSOLUTE);
         sceneView.getGraphicsOverlays().add(polygonLayer);
+
+        ArcGISMap map = new ArcGISMap(Basemap.createStreets());
+        // create a view and set map to it
+        MapView mapView = new MapView();
+        mapView.setMap(map);
+
+        sceneView.addSpatialReferenceChangedListener(src -> throwConfirmationAlert("Scene Loaded in"));
 
         // Hardcoded to Brest France
         setInitialViewPoint(-4.484419007880914, 48.39127111485687);
@@ -246,6 +253,27 @@ public class App extends Application {
                 leftBox.getChildren().add(new Text(ex.toString()));
             }
         }).start();
+
+
+        sceneView.setOnMouseClicked(e -> {
+            try{
+                if (e.getButton() == MouseButton.PRIMARY && e.isStillSincePress()) {
+                    // create a point from location clicked
+                    Point2D mapViewPoint = new Point2D(e.getX(), e.getY());
+                    Point mapPoint = sceneView.screenToBaseSurface(mapViewPoint);
+                    // identify graphics on the graphics overlay
+                    identifyGraphics = sceneView.identifyGraphicsOverlayAsync(pointsOverlay, mapViewPoint, 10, false);
+
+                    identifyGraphics.addDoneListener(() -> Platform.runLater(
+                            createGraphicDialog(mapPoint)
+                    ));
+                }
+            }
+            catch (IOError ex){
+                leftBox.getChildren().add(new Text(ex.toString()));
+            }
+
+        });
 
         Label FOV = new Label("Show Field Of View");
         FOVToggle = new ToggleButton("Show FOV");
@@ -362,7 +390,22 @@ public class App extends Application {
             }
         });
     }
-    
+
+    public double distance(double lat1, double lon1, double lat2, double lon2) {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            return 0;
+        }
+        else {
+            double theta = lon1 - lon2;
+            double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+            dist = Math.acos(dist);
+            dist = Math.toDegrees(dist);
+            dist = dist * 60 * 1.1515;
+            dist = dist * 1.609344;
+            return (dist);
+        }
+    }
+
     //function to clear all layers and list
     public void clearAll(){
         userOverlay.getGraphics().clear();
@@ -386,6 +429,31 @@ public class App extends Application {
         for (Point list : pointLists) {
             lineOfSight(user, list);
         }
+    }
+
+    // added graphic dialog, distance in either KM or M or N
+    private Runnable createGraphicDialog(Point second) {
+        try {
+            // get the list of graphics returned by identify
+            IdentifyGraphicsOverlayResult result = identifyGraphics.get();
+            List<Graphic> graphics = result.getGraphics();
+            if (!graphics.isEmpty()){
+                // show a alert dialog box if a graphic was returned
+                Alert dialog = new Alert(Alert.AlertType.INFORMATION);
+                dialog.initOwner(sceneView.getScene().getWindow());
+                dialog.setHeaderText(null);
+                dialog.setTitle("Information Dialog Sample");
+                double distance = distance( user.getY(), user.getX(), second.getY(), second.getX());
+                DecimalFormat df = new DecimalFormat("#.00");
+                String angleFormated = df.format(distance);
+                dialog.setContentText("Distance : " + angleFormated + "km");
+                dialog.showAndWait();
+            }
+        } catch (Exception e) {
+            // on any error, display the stack trace
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // Functions to draw and create polylines
@@ -453,7 +521,6 @@ public class App extends Application {
         SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
         SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
         userMarkerSymbol.setOutline(blueOutlineSymbol);
-
 
         Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
 
