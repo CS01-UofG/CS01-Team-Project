@@ -41,10 +41,9 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class App extends Application {
     private ArrayList<Point> pointLists = new ArrayList<Point>();
@@ -90,6 +89,9 @@ public class App extends Application {
     private Slider maxDistanceSlider;
 
     private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
+
+    private HashMap<Point, Graphic> GraphicsPoint = new HashMap<Point, Graphic>();
+
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -261,13 +263,12 @@ public class App extends Application {
                     // create a point from location clicked
                     Point2D mapViewPoint = new Point2D(e.getX(), e.getY());
                     Point mapPoint = sceneView.screenToBaseSurface(mapViewPoint);
-                    // identify graphics on the graphics overlay
+//                     identify graphics on the graphics overlay
                     identifyGraphics = sceneView.identifyGraphicsOverlayAsync(pointsOverlay, mapViewPoint, 10, false);
 
-                    identifyGraphics.addDoneListener(() -> Platform.runLater(
-                            createGraphicDialog(mapPoint)
-                    ));
-                }
+                    identifyGraphics.addDoneListener(() -> Platform.runLater(this::run));
+
+                };
             }
             catch (IOError ex){
                 leftBox.getChildren().add(new Text(ex.toString()));
@@ -419,7 +420,7 @@ public class App extends Application {
 
         sensorData.clear();
         pointLists.clear();
-
+        GraphicsPoint.clear();
         throwConfirmationAlert("Cleared All Layers");
     }
     // Functions to draw and create line of sight
@@ -430,28 +431,44 @@ public class App extends Application {
             lineOfSight(user, list);
         }
     }
-
-    // added graphic dialog, distance in either KM or M or N
-    private Runnable createGraphicDialog(Point second) {
+    private void run() {
         try {
-            // get the list of graphics returned by identify
-            IdentifyGraphicsOverlayResult result = identifyGraphics.get();
-            List<Graphic> graphics = result.getGraphics();
-            if (!graphics.isEmpty()){
-                // show a alert dialog box if a graphic was returned
-                Alert dialog = new Alert(Alert.AlertType.INFORMATION);
-                dialog.initOwner(sceneView.getScene().getWindow());
-                dialog.setHeaderText(null);
-                dialog.setTitle("Information Dialog Sample");
+            List<Graphic> graphics;
+            graphics = identifyGraphics.get().getGraphics();
+            if (!graphics.isEmpty()) {
+                Point retrieved_point = getKeyByValue(GraphicsPoint, graphics.get(0));
+                findDistanceFromSensor(retrieved_point);
+            }
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        } catch (ExecutionException executionException) {
+            executionException.printStackTrace();
+        }
+    }
+    public static <T, E> T getKeyByValue(HashMap<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    // added graphic dialog, distance
+    private Runnable findDistanceFromSensor(Point second) {
+        try {
+                lineOfSight(user, second);
+
                 double distance = distance( user.getY(), user.getX(), second.getY(), second.getX());
                 DecimalFormat df = new DecimalFormat("#.00");
                 String angleFormated = df.format(distance);
-                dialog.setContentText("Distance : " + angleFormated + "km");
-                dialog.showAndWait();
-            }
+
+                throwConfirmationAlert("Distance : " + angleFormated + "km");
+
         } catch (Exception e) {
             // on any error, display the stack trace
             e.printStackTrace();
+            throwErrorAlert(e.getMessage());
         }
         return null;
     }
@@ -460,6 +477,7 @@ public class App extends Application {
     public void createPolylines(){
         drawPolylines(pointLists, polygonLayer);
     }
+
     public void drawPolylines(ArrayList<Point> pointLists, GraphicsOverlay graphicsOverlay){
         int len = pointLists.size();
         for(int i=0;i<len - 1;i++) {
@@ -481,9 +499,10 @@ public class App extends Application {
         pointLists.add(viewSpot);
         // create a graphic with the point zgeometry and symbol
         Graphic pointGraphic = new Graphic(viewSpot, simpleMarkerSymbol);
+        GraphicsPoint.put(viewSpot, pointGraphic);
         // add the point graphic to the graphics overlay
         pointsOverlay.getGraphics().add(pointGraphic);
-        pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.toString()));
+        pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.getX() + " " +viewSpot.getX()+ " " + viewSpot.getZ()));
 
     }
     //Given two points it can add it to the map
