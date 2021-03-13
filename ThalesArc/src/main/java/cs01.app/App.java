@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class App extends Application {
-    private ArrayList<Point> pointLists = new ArrayList<Point>();
     private ArrayList<Sensor> sensorData = new ArrayList<Sensor>();
+    private ArrayList<Target> targetList = new ArrayList<Target>();
 
     private Point user;
     TextField userTextField = new TextField();
@@ -90,7 +90,6 @@ public class App extends Application {
 
     private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
 
-    private HashMap<Point, Graphic> GraphicsPoint = new HashMap<Point, Graphic>();
 
 
     public static void main(String[] args) {
@@ -136,7 +135,8 @@ public class App extends Application {
         fovOverlay = new AnalysisOverlay();
         sceneView.getAnalysisOverlays().add(fovOverlay);
         fovOverlay.setVisible(false);
-            // create an analysis overlay for the userViewshed
+
+        // create an analysis overlay for the userViewshed
         viewshedOverlay = new AnalysisOverlay();
         sceneView.getAnalysisOverlays().add(viewshedOverlay);
 
@@ -419,24 +419,46 @@ public class App extends Application {
         pointVisualList.getItems().clear();
 
         sensorData.clear();
-        pointLists.clear();
-        GraphicsPoint.clear();
+
+        targetList.clear();
+
         throwConfirmationAlert("Cleared All Layers");
     }
-    // Functions to draw and create line of sight
-    public void showLineOfSight(Point user, ArrayList<Point> pointLists){
-        int len = pointLists.size();
-        fovOverlay.getAnalyses().clear();
-        for (Point list : pointLists) {
-            lineOfSight(user, list);
+
+    // Returns all Targets
+    public ArrayList<Point> getAllTargets(){
+        ArrayList<Point> points = new ArrayList<>();
+        for(Target target : targetList){
+            points.add(target.getTarget());
         }
+        return points;
     }
+
+    //Finds target point for a given graphic
+    public Point getGraphicPoint(Graphic graphic){
+        for(Target target : targetList){
+            Graphic targetGraphic = target.getGraphic();
+            if (graphic.equals(targetGraphic)){
+                return target.getTarget();
+            }
+        }
+        return null;
+    }
+//    DELETE
+//    // Functions to draw and create line of sight
+//    public void showLineOfSight(Point user, ArrayList<Point> pointLists){
+//        int len = pointLists.size();
+//        fovOverlay.getAnalyses().clear();
+//        for (Point list : pointLists) {
+//            lineOfSight(user, list);
+//        }
+//    }
     private void run() {
         try {
             List<Graphic> graphics;
             graphics = identifyGraphics.get().getGraphics();
             if (!graphics.isEmpty()) {
-                Point retrieved_point = getKeyByValue(GraphicsPoint, graphics.get(0));
+                Point retrieved_point = getGraphicPoint(graphics.get(0));
                 findDistanceFromSensor(retrieved_point);
             }
         } catch (InterruptedException interruptedException) {
@@ -455,7 +477,7 @@ public class App extends Application {
     }
 
     // added graphic dialog, distance
-    private Runnable findDistanceFromSensor(Point second) {
+    private void findDistanceFromSensor(Point second) {
         try {
                 lineOfSight(user, second);
 
@@ -470,12 +492,11 @@ public class App extends Application {
             e.printStackTrace();
             throwErrorAlert(e.getMessage());
         }
-        return null;
     }
 
     // Functions to draw and create polylines
     public void createPolylines(){
-        drawPolylines(pointLists, polygonLayer);
+        drawPolylines(getAllTargets(), polygonLayer);
     }
 
     public void drawPolylines(ArrayList<Point> pointLists, GraphicsOverlay graphicsOverlay){
@@ -486,31 +507,37 @@ public class App extends Application {
     }
 
     //  Given a point it can add it to the map
-    public void addPoint(Double Longitude, Double Latitude, Double Z, GraphicsOverlay pointsOverlay){
+    public void addTarget(Point targetPoint, String description){
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol simpleMarkerSymbol =
                 new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFF5733, 10);
         SimpleLineSymbol blueOutlineSymbol =
                 new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
-
         simpleMarkerSymbol.setOutline(blueOutlineSymbol);
 
-        Point viewSpot = new Point(Longitude, Latitude, Z, SpatialReferences.getWgs84());
-        pointLists.add(viewSpot);
         // create a graphic with the point zgeometry and symbol
-        Graphic pointGraphic = new Graphic(viewSpot, simpleMarkerSymbol);
-        GraphicsPoint.put(viewSpot, pointGraphic);
+        Graphic pointGraphic = new Graphic(targetPoint, simpleMarkerSymbol);
+
+        //Create a Target Object
+        Target target = new Target.TargetBuilder(targetPoint, pointGraphic)
+                .description(description)
+                .build();
+
+        // Add target to targetList
+        targetList.add(target);
+
         // add the point graphic to the graphics overlay
         pointsOverlay.getGraphics().add(pointGraphic);
-        pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.getX() + " " +viewSpot.getX()+ " " + viewSpot.getZ()));
+        pointVisualList.getItems().add( new Text(target.toString()));
 
     }
     //Given two points it can add it to the map
     public void addPolyline(Point point1, Point point2, GraphicsOverlay graphicsOverlay){
-        // create a point collection with a spatial reference, and add three points to it
+        // create a point collection with a spatial reference, and add two points to it
         PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
         polylinePoints.add(point1);
         polylinePoints.add(point2);
+
         // create a polyline geometry from the point collection
         Polyline polyline = new Polyline(polylinePoints);
 
@@ -564,21 +591,27 @@ public class App extends Application {
         updateUserText();
 
         //add point user is looking at
-        addPoint(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude, pointsOverlay);
+        Point target = new Point(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude);
+
+        addTarget(target, sensor.target_description);
         PointBuilder pointBuilder = new PointBuilder(user);
-        pointBuilder.setZ(sensor.sensor_elevation);
+//        pointBuilder.setZ(sensor.sensor_elevation);
 
         if (userViewshed == null){
             addViewshed();
         }
 
-        userViewshed.setLocation(pointBuilder.toGeometry());
-        updateCameraPosition();
+        try {
+            userViewshed.setLocation(pointBuilder.toGeometry());
+            updateCameraPosition();
 
-        //Bearing needs to be calculated from the north
-        userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
-        userViewshed.setMaxDistance(sensor.target_range);
-//        userViewshed.setPitch(sensor.sensor_altitude);
+            //Bearing needs to be calculated from the north
+            userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
+            userViewshed.setMaxDistance(sensor.target_range);
+            userViewshed.setPitch(sensor.sensor_altitude);
+        }catch (Exception e){
+            System.out.println(e);
+        }
 
     }
 
