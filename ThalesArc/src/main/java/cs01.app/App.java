@@ -81,13 +81,6 @@ public class App extends Application {
     private Button cameraButton;
     private Button clearAllEntities;
 
-    private Slider headingSlider;
-    private Slider pitchSlider;
-    private Slider horizontalAngleSlider;
-    private Slider verticalAngleSlider;
-    private Slider minDistanceSlider;
-    private Slider maxDistanceSlider;
-
     private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
 
 
@@ -266,7 +259,7 @@ public class App extends Application {
 //                     identify graphics on the graphics overlay
                     identifyGraphics = sceneView.identifyGraphicsOverlayAsync(pointsOverlay, mapViewPoint, 10, false);
 
-                    identifyGraphics.addDoneListener(() -> Platform.runLater(this::run));
+                    identifyGraphics.addDoneListener(() -> Platform.runLater(this::distanceToPoint));
 
                 };
             }
@@ -284,39 +277,21 @@ public class App extends Application {
         visibilityToggle = new ToggleButton("visibilityToggle");
         frustumToggle = new ToggleButton("frustumToggle");
 
-        Label headingLabel = new Label("Heading");
-        headingSlider = this.componentFactory.createSlider(0, 360, 40, 20, 5, 1);
-
-        Label pitchLabel = new Label("Pitch Angle");
-        pitchSlider = this.componentFactory.createSlider(0, 180, 100, 50, 5, 10);
-
-        Label horizontalLabel = new Label("Horizontal Angle");
-        horizontalAngleSlider = this.componentFactory.createSlider(0, 180, 50, 50, 5, 10);
-
-        Label verticalAngle = new Label("Vertical Angle");
-        verticalAngleSlider = this.componentFactory.createSlider(0, 180, 70, 50, 5, 10);
-
-        Label minDistance = new Label("Minimum Distance ");
-        minDistanceSlider = this.componentFactory.createSlider(0, 100, 0, 50, 5, 10);
-
-        Label maxDistance = new Label("Max Distance ");
-        maxDistanceSlider = this.componentFactory.createSlider(0, 1000, 80, 50, 5, 10);
-
         // create a button to update the view
         cameraButton = new Button("Update camera");
         cameraButton.setOnMouseClicked(e -> updateCameraPosition());
 
         createPolylines = new Button("Create Polylines");
         createPolylines.setOnAction(
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        createPolylines();
-                    }
+            new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    createPolylines();
                 }
+            }
         );
 
-        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle);
         centre.getChildren().addAll(sceneView, cameraButton);
         StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
 //        StackPane.setAlignment(FOVToggle, Pos.TOP_LEFT);
@@ -444,16 +419,8 @@ public class App extends Application {
         }
         return null;
     }
-//    DELETE
-//    // Functions to draw and create line of sight
-//    public void showLineOfSight(Point user, ArrayList<Point> pointLists){
-//        int len = pointLists.size();
-//        fovOverlay.getAnalyses().clear();
-//        for (Point list : pointLists) {
-//            lineOfSight(user, list);
-//        }
-//    }
-    private void run() {
+    // Returns the distance to a point from user
+    private void distanceToPoint() {
         try {
             List<Graphic> graphics;
             graphics = identifyGraphics.get().getGraphics();
@@ -467,18 +434,11 @@ public class App extends Application {
             executionException.printStackTrace();
         }
     }
-    public static <T, E> T getKeyByValue(HashMap<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
 
     // added graphic dialog, distance
     private void findDistanceFromSensor(Point second) {
         try {
+                fovOverlay.getAnalyses().clear();
                 lineOfSight(user, second);
 
                 double distance = distance( user.getY(), user.getX(), second.getY(), second.getX());
@@ -617,9 +577,7 @@ public class App extends Application {
 
     public void addViewshed(){
 
-        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
-                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
-                maxDistanceSlider.getValue());
+        userViewshed = new LocationViewshed(user,10.0,10.0,80.0,60.0,2.0,10.0);
         // set the colors of the visible and obstructed areas
         Viewshed.setVisibleColor(0xCC00FF00);
         Viewshed.setObstructedColor(0xCCFF0000);
