@@ -13,10 +13,12 @@ public class Sensor {
     public double target_altitude;
     public double target_range;
 
+    public String target_description = "";
+
 
     public Sensor(int id, Double sensor_latitude, Double sensor_longitude, Double sensor_altitude, Double sensor_azimuth,
                   Double sensor_elevation, Double target_latitude, Double target_longitude, Double target_altitude,
-                  Double target_range){
+                  Double target_range, String target_description){
         this.id = id;
         this.sensor_latitude = sensor_latitude;
         this.sensor_longitude = sensor_longitude;
@@ -27,5 +29,6 @@ public class Sensor {
         this.target_longitude = target_longitude;
         this.target_altitude = target_altitude;
         this.target_range = target_range;
+        this.target_description = target_description;
     }
 }

@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class App extends Application {
-    private ArrayList<Point> pointLists = new ArrayList<Point>();
     private ArrayList<Sensor> sensorData = new ArrayList<Sensor>();
+    private ArrayList<Target> targetList = new ArrayList<Target>();
 
     private Point user;
     TextField userTextField = new TextField();
@@ -81,16 +81,8 @@ public class App extends Application {
     private Button cameraButton;
     private Button clearAllEntities;
 
-    private Slider headingSlider;
-    private Slider pitchSlider;
-    private Slider horizontalAngleSlider;
-    private Slider verticalAngleSlider;
-    private Slider minDistanceSlider;
-    private Slider maxDistanceSlider;
-
     private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
 
-    private HashMap<Point, Graphic> GraphicsPoint = new HashMap<Point, Graphic>();
 
 
     public static void main(String[] args) {
@@ -136,7 +128,8 @@ public class App extends Application {
         fovOverlay = new AnalysisOverlay();
         sceneView.getAnalysisOverlays().add(fovOverlay);
         fovOverlay.setVisible(false);
-            // create an analysis overlay for the userViewshed
+
+        // create an analysis overlay for the userViewshed
         viewshedOverlay = new AnalysisOverlay();
         sceneView.getAnalysisOverlays().add(viewshedOverlay);
 
@@ -266,7 +259,7 @@ public class App extends Application {
 //                     identify graphics on the graphics overlay
                     identifyGraphics = sceneView.identifyGraphicsOverlayAsync(pointsOverlay, mapViewPoint, 10, false);
 
-                    identifyGraphics.addDoneListener(() -> Platform.runLater(this::run));
+                    identifyGraphics.addDoneListener(() -> Platform.runLater(this::distanceToPoint));
 
                 };
             }
@@ -284,39 +277,21 @@ public class App extends Application {
         visibilityToggle = new ToggleButton("visibilityToggle");
         frustumToggle = new ToggleButton("frustumToggle");
 
-        Label headingLabel = new Label("Heading");
-        headingSlider = this.componentFactory.createSlider(0, 360, 40, 20, 5, 1);
-
-        Label pitchLabel = new Label("Pitch Angle");
-        pitchSlider = this.componentFactory.createSlider(0, 180, 100, 50, 5, 10);
-
-        Label horizontalLabel = new Label("Horizontal Angle");
-        horizontalAngleSlider = this.componentFactory.createSlider(0, 180, 50, 50, 5, 10);
-
-        Label verticalAngle = new Label("Vertical Angle");
-        verticalAngleSlider = this.componentFactory.createSlider(0, 180, 70, 50, 5, 10);
-
-        Label minDistance = new Label("Minimum Distance ");
-        minDistanceSlider = this.componentFactory.createSlider(0, 100, 0, 50, 5, 10);
-
-        Label maxDistance = new Label("Max Distance ");
-        maxDistanceSlider = this.componentFactory.createSlider(0, 1000, 80, 50, 5, 10);
-
         // create a button to update the view
         cameraButton = new Button("Update camera");
         cameraButton.setOnMouseClicked(e -> updateCameraPosition());
 
         createPolylines = new Button("Create Polylines");
         createPolylines.setOnAction(
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        createPolylines();
-                    }
+            new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    createPolylines();
                 }
+            }
         );
 
-        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle, headingLabel, headingSlider, pitchLabel, pitchSlider, horizontalLabel, horizontalAngleSlider, verticalAngle, verticalAngleSlider, minDistance, minDistanceSlider, maxDistance, maxDistanceSlider);
+        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle);
         centre.getChildren().addAll(sceneView, cameraButton);
         StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
 //        StackPane.setAlignment(FOVToggle, Pos.TOP_LEFT);
@@ -419,24 +394,38 @@ public class App extends Application {
         pointVisualList.getItems().clear();
 
         sensorData.clear();
-        pointLists.clear();
-        GraphicsPoint.clear();
+
+        targetList.clear();
+
         throwConfirmationAlert("Cleared All Layers");
     }
-    // Functions to draw and create line of sight
-    public void showLineOfSight(Point user, ArrayList<Point> pointLists){
-        int len = pointLists.size();
-        fovOverlay.getAnalyses().clear();
-        for (Point list : pointLists) {
-            lineOfSight(user, list);
+
+    // Returns all Targets
+    public ArrayList<Point> getAllTargets(){
+        ArrayList<Point> points = new ArrayList<>();
+        for(Target target : targetList){
+            points.add(target.getTarget());
         }
+        return points;
     }
-    private void run() {
+
+    //Finds target point for a given graphic
+    public Point getGraphicPoint(Graphic graphic){
+        for(Target target : targetList){
+            Graphic targetGraphic = target.getGraphic();
+            if (graphic.equals(targetGraphic)){
+                return target.getTarget();
+            }
+        }
+        return null;
+    }
+    // Returns the distance to a point from user
+    private void distanceToPoint() {
         try {
             List<Graphic> graphics;
             graphics = identifyGraphics.get().getGraphics();
             if (!graphics.isEmpty()) {
-                Point retrieved_point = getKeyByValue(GraphicsPoint, graphics.get(0));
+                Point retrieved_point = getGraphicPoint(graphics.get(0));
                 findDistanceFromSensor(retrieved_point);
             }
         } catch (InterruptedException interruptedException) {
@@ -445,18 +434,11 @@ public class App extends Application {
             executionException.printStackTrace();
         }
     }
-    public static <T, E> T getKeyByValue(HashMap<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
 
     // added graphic dialog, distance
-    private Runnable findDistanceFromSensor(Point second) {
+    private void findDistanceFromSensor(Point second) {
         try {
+                fovOverlay.getAnalyses().clear();
                 lineOfSight(user, second);
 
                 double distance = distance( user.getY(), user.getX(), second.getY(), second.getX());
@@ -470,12 +452,11 @@ public class App extends Application {
             e.printStackTrace();
             throwErrorAlert(e.getMessage());
         }
-        return null;
     }
 
     // Functions to draw and create polylines
     public void createPolylines(){
-        drawPolylines(pointLists, polygonLayer);
+        drawPolylines(getAllTargets(), polygonLayer);
     }
 
     public void drawPolylines(ArrayList<Point> pointLists, GraphicsOverlay graphicsOverlay){
@@ -486,31 +467,37 @@ public class App extends Application {
     }
 
     //  Given a point it can add it to the map
-    public void addPoint(Double Longitude, Double Latitude, Double Z, GraphicsOverlay pointsOverlay){
+    public void addTarget(Point targetPoint, String description){
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol simpleMarkerSymbol =
                 new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFF5733, 10);
         SimpleLineSymbol blueOutlineSymbol =
                 new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
-
         simpleMarkerSymbol.setOutline(blueOutlineSymbol);
 
-        Point viewSpot = new Point(Longitude, Latitude, Z, SpatialReferences.getWgs84());
-        pointLists.add(viewSpot);
         // create a graphic with the point zgeometry and symbol
-        Graphic pointGraphic = new Graphic(viewSpot, simpleMarkerSymbol);
-        GraphicsPoint.put(viewSpot, pointGraphic);
+        Graphic pointGraphic = new Graphic(targetPoint, simpleMarkerSymbol);
+
+        //Create a Target Object
+        Target target = new Target.TargetBuilder(targetPoint, pointGraphic)
+                .description(description)
+                .build();
+
+        // Add target to targetList
+        targetList.add(target);
+
         // add the point graphic to the graphics overlay
         pointsOverlay.getGraphics().add(pointGraphic);
-        pointVisualList.getItems().add( new Text("Point located at: " +  viewSpot.getX() + " " +viewSpot.getX()+ " " + viewSpot.getZ()));
+        pointVisualList.getItems().add( new Text(target.toString()));
 
     }
     //Given two points it can add it to the map
     public void addPolyline(Point point1, Point point2, GraphicsOverlay graphicsOverlay){
-        // create a point collection with a spatial reference, and add three points to it
+        // create a point collection with a spatial reference, and add two points to it
         PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
         polylinePoints.add(point1);
         polylinePoints.add(point2);
+
         // create a polyline geometry from the point collection
         Polyline polyline = new Polyline(polylinePoints);
 
@@ -564,29 +551,33 @@ public class App extends Application {
         updateUserText();
 
         //add point user is looking at
-        addPoint(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude, pointsOverlay);
+        Point target = new Point(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude);
+
+        addTarget(target, sensor.target_description);
         PointBuilder pointBuilder = new PointBuilder(user);
-        pointBuilder.setZ(sensor.sensor_elevation);
+//        pointBuilder.setZ(sensor.sensor_elevation);
 
         if (userViewshed == null){
             addViewshed();
         }
 
-        userViewshed.setLocation(pointBuilder.toGeometry());
-        updateCameraPosition();
+        try {
+            userViewshed.setLocation(pointBuilder.toGeometry());
+            updateCameraPosition();
 
-        //Bearing needs to be calculated from the north
-        userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
-        userViewshed.setMaxDistance(sensor.target_range);
-//        userViewshed.setPitch(sensor.sensor_altitude);
+            //Bearing needs to be calculated from the north
+            userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
+            userViewshed.setMaxDistance(sensor.target_range);
+            userViewshed.setPitch(sensor.sensor_altitude);
+        }catch (Exception e){
+            System.out.println(e);
+        }
 
     }
 
     public void addViewshed(){
 
-        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
-                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
-                maxDistanceSlider.getValue());
+        userViewshed = new LocationViewshed(user,10.0,10.0,80.0,60.0,2.0,10.0);
         // set the colors of the visible and obstructed areas
         Viewshed.setVisibleColor(0xCC00FF00);
         Viewshed.setObstructedColor(0xCCFF0000);
