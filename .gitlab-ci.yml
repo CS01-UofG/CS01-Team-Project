@@ -1,26 +1,21 @@
 default:
-  image: node:14.15.0
+  # This template uses jdk8 for verifying and deploying images
+  image: maven:3.6.3-jdk-11
+
   before_script:
-    - echo "Test and Build pipelines" 
+    - echo "Test pipeline" 
   
 cache:
   paths:
-  - ElectronJSApp/node_modules/
-
-release-job: 
-  tags:
-    - docker
-  before_script: 
-    - cd ElectronJSApp/
-    - npm install
-  script: 
-    - npm run make
+  - ThalesArc/
 
 test-job:
   tags:
     - docker
   before_script: 
-    - cd ElectronJSApp/
-    - npm install
+    - dir
+    - cd ThalesArc
+    - echo "Should do things"
+    - mvn dependency:unpack
   script:
-    - npm test
+    - mvn test
