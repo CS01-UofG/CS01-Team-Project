@@ -83,8 +83,6 @@ public class App extends Application {
 
     private ListenableFuture<IdentifyGraphicsOverlayResult> identifyGraphics;
 
-
-
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -114,7 +112,7 @@ public class App extends Application {
         ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer(buildings);
         scene.getOperationalLayers().add(sceneLayer);
 
-//        // Elevation Layer
+//        // Elevation Layer Hidden as it's an optional feature for customer to decided upon demonstations
 //        ArcGISTiledElevationSource elevationSource = new ArcGISTiledElevationSource("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer");
 //        Surface surface = new Surface();
 //        surface.getElevationSources().add(elevationSource);
@@ -279,7 +277,7 @@ public class App extends Application {
 
         // create a button to update the view
         cameraButton = new Button("Update camera");
-        cameraButton.setOnMouseClicked(e -> updateCameraPosition());
+        cameraButton.setOnMouseClicked(e -> updateCameraPosition(500.0, 10.0, 60.0, 0.0));
 
         createPolylines = new Button("Create Polylines");
         createPolylines.setOnAction(
@@ -294,51 +292,12 @@ public class App extends Application {
         leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle);
         centre.getChildren().addAll(sceneView, cameraButton);
         StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
-//        StackPane.setAlignment(FOVToggle, Pos.TOP_LEFT);
 
         polylinesToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(polylinesToggle.isSelected()) );
         polylinesToggle.textProperty().bind(Bindings.createStringBinding(() -> polylinesToggle.isSelected() ? "ON" : "OFF", polylinesToggle.selectedProperty()));
 
         FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(!FOVToggle.isSelected()) );
         FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
-
-
-
-        // set the user and camera
-
-//        user = new Point(-4.50, 48.4, 50, SpatialReferences.getWgs84());
-
-        // create a userViewshed from the camera
-//        userViewshed = new LocationViewshed(user, headingSlider.getValue(), pitchSlider.getValue(),
-//                horizontalAngleSlider.getValue(), verticalAngleSlider.getValue(), minDistanceSlider.getValue(),
-//                maxDistanceSlider.getValue());
-//        // set the colors of the visible and obstructed areas
-//        Viewshed.setVisibleColor(0xCC00FF00);
-//        Viewshed.setObstructedColor(0xCCFF0000);
-//        // set the color and show the frustum outline
-//        Viewshed.setFrustumOutlineColor(0xCC0000FF);
-//        userViewshed.setFrustumOutlineVisible(true);
-
-        // toggle visibility
-//        visibilityToggle.selectedProperty().addListener(e -> userViewshed.setVisible(!visibilityToggle.isSelected()));
-//        visibilityToggle.textProperty().bind(Bindings.createStringBinding(() -> visibilityToggle.isSelected() ? "OFF" : "ON", visibilityToggle.selectedProperty()));
-//        frustumToggle.selectedProperty().addListener(e -> userViewshed.setFrustumOutlineVisible(!frustumToggle.isSelected()));
-//        frustumToggle.textProperty().bind(Bindings.createStringBinding(() -> frustumToggle.isSelected() ? "OFF" : "ON", frustumToggle.selectedProperty()));
-//        // heading slider
-//        headingSlider.valueProperty().addListener(e -> userViewshed.setHeading(headingSlider.getValue()));
-//        // pitch slider
-//        pitchSlider.valueProperty().addListener(e -> userViewshed.setPitch(pitchSlider.getValue()));
-//        // horizontal angle slider
-//        horizontalAngleSlider.valueProperty().addListener(e -> userViewshed.setHorizontalAngle(horizontalAngleSlider.getValue()));
-//        // vertical angle slider
-//        verticalAngleSlider.valueProperty().addListener(e -> userViewshed.setVerticalAngle(verticalAngleSlider.getValue()));
-//        // distance sliders
-//        minDistanceSlider.valueProperty().addListener(e -> userViewshed.setMinDistance(minDistanceSlider.getValue()));
-//        maxDistanceSlider.valueProperty().addListener(e -> userViewshed.setMaxDistance(maxDistanceSlider.getValue()));
-//        // create an analysis overlay to add the userViewshed to the scene view
-
-//        viewshedOverlay.getAnalyses().add(userViewshed);
-
 
         SplitPane mainSplit = new SplitPane();
         leftBox.getChildren().add( leftBox2);
@@ -367,6 +326,15 @@ public class App extends Application {
         });
     }
 
+    /**
+     * Returns the distance from point 1 to point 2
+     *
+     * @param lat1
+     * @param lon1
+     * @param lat2
+     * @param lon2
+     * @return
+     */
     public double distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return 0;
@@ -382,7 +350,9 @@ public class App extends Application {
         }
     }
 
-    //function to clear all layers and list
+    /**
+     * Clears all overlays on the map and throws a confirmations
+     */
     public void clearAll(){
         userOverlay.getGraphics().clear();
         pointsOverlay.getGraphics().clear();
@@ -400,7 +370,10 @@ public class App extends Application {
         throwConfirmationAlert("Cleared All Layers");
     }
 
-    // Returns all Targets
+    /**
+     * Returns all the targets from Target class
+     * @return points
+     */
     public ArrayList<Point> getAllTargets(){
         ArrayList<Point> points = new ArrayList<>();
         for(Target target : targetList){
@@ -409,7 +382,12 @@ public class App extends Application {
         return points;
     }
 
-    //Finds target point for a given graphic
+    /**
+     * Returns the target for a graphic from the targetList
+     *
+     * @param graphic
+     * @return null if no point found, else targets graphic point
+     */
     public Point getGraphicPoint(Graphic graphic){
         for(Target target : targetList){
             Graphic targetGraphic = target.getGraphic();
@@ -419,7 +397,10 @@ public class App extends Application {
         }
         return null;
     }
-    // Returns the distance to a point from user
+
+    /**
+     * Generates a distance from users location
+     */
     private void distanceToPoint() {
         try {
             List<Graphic> graphics;
@@ -435,7 +416,11 @@ public class App extends Application {
         }
     }
 
-    // added graphic dialog, distance
+    /**
+     * Throws a confirmation of the distance from users location and a point
+     *
+     * @param second
+     */
     private void findDistanceFromSensor(Point second) {
         try {
                 fovOverlay.getAnalyses().clear();
@@ -454,19 +439,95 @@ public class App extends Application {
         }
     }
 
-    // Functions to draw and create polylines
+    /**
+     * Calls the draw polylines function used by a button
+     */
     public void createPolylines(){
         drawPolylines(getAllTargets(), polygonLayer);
     }
 
+    /**
+     * Draws polylines between each point on the pointsList
+     *
+     * @param pointLists
+     * @param graphicsOverlay
+     */
     public void drawPolylines(ArrayList<Point> pointLists, GraphicsOverlay graphicsOverlay){
         int len = pointLists.size();
         for(int i=0;i<len - 1;i++) {
             addPolyline(pointLists.get(i), pointLists.get(i + 1), graphicsOverlay);
         }
     }
+    /**
+     * Draws a polyline between two locations on the map
+     *
+     * @param point1 start
+     * @param point2 destination
+     * @param graphicsOverlay
+     */
+    public void addPolyline(Point point1, Point point2, GraphicsOverlay graphicsOverlay){
+        // create a point collection with a spatial reference, and add two points to it
+        PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
+        polylinePoints.add(point1);
+        polylinePoints.add(point2);
 
-    //  Given a point it can add it to the map
+        // create a polyline geometry from the point collection
+        Polyline polyline = new Polyline(polylinePoints);
+
+        // create a blue line symbol for the polyline
+        SimpleLineSymbol polylineSymbol =
+                new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 3);
+
+        // create a polyline graphic with the polyline geometry and symbol
+        Graphic polylineGraphic = new Graphic(polyline, polylineSymbol);
+
+        // add the polyline graphic to the graphics overlay
+        graphicsOverlay.getGraphics().add(polylineGraphic);
+    }
+
+    /**
+     * Adds a line of sight between two points
+     *
+     * @param point1 Start
+     * @param point2 Destination
+     */
+    public void lineOfSight(Point point1, Point point2) {
+        LocationLineOfSight lineOfSight = new LocationLineOfSight(point1, point2);
+        fovOverlay.getAnalyses().add(lineOfSight);
+    }
+
+    /**
+     * Moves the user to desired location and clears previous location marker.
+     *
+     * @param newLocation
+     */
+    public void moveUser(Point newLocation) {
+
+        userOverlay.getGraphics().clear();
+        // create an white (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
+        SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
+        SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
+        userMarkerSymbol.setOutline(blueOutlineSymbol);
+
+        Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
+        userOverlay.getGraphics().add(pointGraphic);
+    }
+
+    /**
+     * Returns a Sensor object which is parsed through the fastJSON library
+     *
+     * @param data string
+     * @return JSON object
+     */
+    public Sensor convertJSON(String data){
+        return JSON.parseObject(data,Sensor.class);
+    }
+
+    /**
+     * Adds a target onto the map and list, and builds a Target
+     * @param targetPoint
+     * @param description
+     */
     public void addTarget(Point targetPoint, String description){
         // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
         SimpleMarkerSymbol simpleMarkerSymbol =
@@ -491,71 +552,29 @@ public class App extends Application {
         pointVisualList.getItems().add( new Text(target.toString()));
 
     }
-    //Given two points it can add it to the map
-    public void addPolyline(Point point1, Point point2, GraphicsOverlay graphicsOverlay){
-        // create a point collection with a spatial reference, and add two points to it
-        PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
-        polylinePoints.add(point1);
-        polylinePoints.add(point2);
 
-        // create a polyline geometry from the point collection
-        Polyline polyline = new Polyline(polylinePoints);
-
-        // create a blue line symbol for the polyline
-        SimpleLineSymbol polylineSymbol =
-                new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 3);
-
-        // create a polyline graphic with the polyline geometry and symbol
-        Graphic polylineGraphic = new Graphic(polyline, polylineSymbol);
-
-        // add the polyline graphic to the graphics overlay
-        graphicsOverlay.getGraphics().add(polylineGraphic);
-    }
-
-    // Function to add lineofsight
-    public void lineOfSight(Point point1, Point point2) {
-        LocationLineOfSight lineOfSight = new LocationLineOfSight(point1, point2);
-        fovOverlay.getAnalyses().add(lineOfSight);
-    }
-
-    // Moves the user and fov cone to a new location
-    public void moveUser(Point newLocation) {
-
-        userOverlay.getGraphics().clear();
-
-        // create an opaque orange (0xFFFF5733) point symbol with a blue (0xFF0063FF) outline symbol
-        SimpleMarkerSymbol userMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFFFFFFFF, 10);
-        SimpleLineSymbol blueOutlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, 0xFF0063FF, 2);
-        userMarkerSymbol.setOutline(blueOutlineSymbol);
-
-        Graphic pointGraphic = new Graphic(newLocation, userMarkerSymbol);
-
-        updateUserText();
-        userOverlay.getGraphics().add(pointGraphic);
-    }
-
-    // function to return JSON object
-    public Sensor convertJSON(String data){
-        return JSON.parseObject(data,Sensor.class);
-    }
-
-    // Adds data through JSON
+    /**
+     * Reads a data string, which contains information about the sensor and target locations.
+     * This then adds the user location as well as target point of interest.
+     *
+     * The viewshed is updated as requested for and updates the camera location.
+     *
+     * @param data
+     */
     public void readJSON(String data){
         Sensor sensor = convertJSON(data);
         if (!sensorData.contains(sensor)){
             sensorData.add(sensor);
         }
-        // Add user and move user
+        // Updates users point and moves user
         user = new Point(sensor.sensor_latitude, sensor.sensor_longitude, sensor.sensor_elevation, SpatialReferences.getWgs84());
         moveUser(user);
         updateUserText();
-
-        //add point user is looking at
+        // Creates a new target Point and adds it to the map
         Point target = new Point(sensor.target_latitude, sensor.target_longitude, sensor.target_altitude);
-
         addTarget(target, sensor.target_description);
         PointBuilder pointBuilder = new PointBuilder(user);
-//        pointBuilder.setZ(sensor.sensor_elevation);
+        // pointBuilder.setZ(sensor.sensor_elevation);
 
         if (userViewshed == null){
             addViewshed();
@@ -563,18 +582,21 @@ public class App extends Application {
 
         try {
             userViewshed.setLocation(pointBuilder.toGeometry());
-            updateCameraPosition();
+            updateCameraPosition(500.0, 10.0, 60.0, 0.0);
 
             //Bearing needs to be calculated from the north
             userViewshed.setHeading(360.0 - sensor.sensor_azimuth);
             userViewshed.setMaxDistance(sensor.target_range);
             userViewshed.setPitch(sensor.sensor_altitude);
-        }catch (Exception e){
+        } catch (Exception e){
             System.out.println(e);
         }
 
     }
 
+    /**
+     * Imports a predefined viewshed to the analysis layer
+      */
     public void addViewshed(){
 
         userViewshed = new LocationViewshed(user,10.0,10.0,80.0,60.0,2.0,10.0);
@@ -588,6 +610,9 @@ public class App extends Application {
         viewshedOverlay.getAnalyses().add(userViewshed);
     }
 
+    /**
+     * Sets an initial view point at the defined locations
+     */
     public void setInitialViewPoint(double longitude, double latitude){
         Point viewpoint = new Point(longitude, latitude);
         Camera camera = new Camera(viewpoint, 5000.0, 10.0, 60.0, 0.0);
@@ -596,25 +621,33 @@ public class App extends Application {
         sceneView.setViewpointCamera(camera);
     }
 
-    // Updates the user location in text bar
+    /**
+     * Updates user location at the text bar
+     */
     public void updateUserText(){
-        double x = user.getX();
-        double y = user.getY();
-        userTextField.setText("x: " + x + " y: " + y + " z: " + user.getZ());
+        userTextField.setText("x: " + user.getX() + " y: " +user.getY() + " z: " + user.getZ());
     }
 
-    // Updates the default camera position to where the user is
-    public void updateCameraPosition(){
-        Camera camera = new Camera(user, 500.0, 10.0, 60.0, 0.0);
+    /**
+     * Updates the camera location at a predefined location
+     *
+     * @param distance distance from camera to user
+     * @param heading heading angle
+     * @param pitch pitch angle
+     * @param roll angle
+     */
+    public void updateCameraPosition(double distance, double heading, double pitch, double roll){
+        Camera camera = new Camera(user, distance, heading, pitch, roll);
         sceneView.setViewpointCamera(camera);
     }
 
-    // Read / Load And Write files
-    public static void configureFileChooser(
-        final FileChooser fileChooser) {
+    /**
+     * Opens the operating system file chooser
+     */
+    public static void configureFileChooser( final FileChooser fileChooser) {
             fileChooser.setTitle("Load JSON");
             fileChooser.setInitialDirectory(
-                    new File(System.getProperty("user.dir"))
+                    new File(getUserDirectory())
         );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("JSON", "*.JSON"),
@@ -622,18 +655,37 @@ public class App extends Application {
 
         );
     }
-    // Gets working directory set at JSONLogs
+
+    /**
+     * Returns user directory
+     */
+    public static String getUserDirectory(){
+        return  System.getProperty("user.dir");
+    }
+
+    /**
+     * Gets the log directory for the project
+     */
     public String getLogDir(){
-        String currentUserDir = System.getProperty("user.dir");
+        String currentUserDir = getUserDirectory();
         return currentUserDir + File.separator + "JSONLogs";
     }
-    // Gets filecount
-    public int fileCount(String filename){
-        File file = new File(filename);
-        // Populates the array with names of files and directories
-        return Objects.requireNonNull(file.list()).length;
+
+    /**
+     * Find the number of files in a directory
+     *
+     * @param directoryName name of the directory
+     */
+    public int fileCount(String directoryName){
+        File directory = new File(directoryName);
+        return Objects.requireNonNull(directory.list()).length;
     }
-    //Lets user open file and input data throught JSONLogs
+
+    /**
+     * Promts the user to read a file.
+     *
+     * @param file selected file from the user
+     */
     public void openFile(File file) {
         try {
             logfile = file;
@@ -642,20 +694,25 @@ public class App extends Application {
             System.out.println(ex);
         }
     }
-    //Read file functionality
+
+    /**
+     * Reads selected file and adds it to the map
+     *
+     * @param file selected file from the user
+     */
     public void readFile(File file) throws FileNotFoundException {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            // process the line
             if (line.length() > 0) {
-                //do lots of stuff to sort the data into lists etc
-                System.out.println(line);
                 readJSON(line);
             }
         }
     }
-    //Lets user create a new log file
+
+    /**
+     * Creates a file for the user and throws a confirmation, else shows the error.
+     */
     public void createFile(){
         int fileCount = fileCount(getLogDir()) + 1;
         try {
@@ -664,15 +721,16 @@ public class App extends Application {
             if (newFile.createNewFile()) {
                 logfile = newFile;
                 throwConfirmationAlert("File created: " + newFile.getName());
-
             }
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            throwErrorAlert("An error occurred.");
             e.printStackTrace();
         }
-
     }
-    // Appends data to a file.
+
+    /**
+     * Appends sensor data to the file
+     */
     public void appendFile() throws IOException {
         FileWriter fr = new FileWriter(logfile, true);
         for (Sensor data: sensorData){
@@ -682,18 +740,27 @@ public class App extends Application {
         fr.close();
     }
 
+    /**
+     * Throws an error alert
+     *
+     * @param message Message user wants to show
+     */
     public void throwErrorAlert(String message){
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setContentText(message);
         a.show();
     }
-
+    /**
+     * Throws an confirmation alert
+     *
+     * @param message Message user wants to show
+     */
     public void throwConfirmationAlert(String message){
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setContentText(message);
         a.show();
     }
-    
+
     /**
      * Stops and releases all resources used in application.
      */
