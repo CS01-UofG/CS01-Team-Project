@@ -24,6 +24,12 @@
   <component name="ChangeListManager">
     <list default="true" id="cb927452-3035-4750-88bc-5a70d5477bd7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log3.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log4.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log5.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/JSONLogs/log6.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +47,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="Feature_GraphicLayers" />
+        <entry key="$PROJECT_DIR$/.." value="Feature_Simulation_Script" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -67,6 +73,7 @@
     <property name="project.structure.last.edited" value="Problems" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
@@ -106,6 +113,14 @@
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state x="640" y="260" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614710724616" />
+    <state x="743" y="394" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog" timestamp="1616597021413">
+      <screen x="0" y="0" width="1920" height="1048" />
+    </state>
+    <state x="743" y="394" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616597021413" />
+    <state x="707" y="379" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1616597043314">
+      <screen x="0" y="0" width="1920" height="1048" />
+    </state>
+    <state x="707" y="379" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616597043314" />
     <state x="740" y="241" key="FileChooserDialogImpl" timestamp="1614433868194">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
