@@ -143,25 +143,25 @@
                     <goals>
                         <goal>shade</goal>
                     </goals>
-                    <configuration>
-                        <createDependencyReducedPom>false</createDependencyReducedPom>
-                        <filters>
-                            <filter>
-                                <artifact>*:*</artifact>
-                                <excludes>
-                                    <exclude>META-INF/*.SF</exclude>
-                                    <exclude>META-INF/*.DSA</exclude>
-                                    <exclude>META-INF/*.RSA</exclude>
-                                    <exclude>.settings/**</exclude>
-                                    <exclude>*.classpath</exclude>
-                                    <exclude>*.project</exclude>
-                                    <exclude>*.txt</exclude>
-                                </excludes>
-                            </filter>
-                        </filters>
-                    </configuration>
                 </execution>
             </executions>
+            <configuration>
+                <createDependencyReducedPom>false</createDependencyReducedPom>
+                <filters>
+                    <filter>
+                        <artifact>*:*</artifact>
+                        <excludes>
+                            <exclude>META-INF/*.SF</exclude>
+                            <exclude>META-INF/*.DSA</exclude>
+                            <exclude>META-INF/*.RSA</exclude>
+                            <exclude>.settings/**</exclude>
+                            <exclude>*.classpath</exclude>
+                            <exclude>*.project</exclude>
+                            <exclude>*.txt</exclude>
+                        </excludes>
+                    </filter>
+                </filters>
+            </configuration>
         </plugin>
     </plugins>
 </build>
