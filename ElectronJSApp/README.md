@@ -1,5 +1,6 @@
-#### Basic Setup 
-* npm install - in ElectronJS directory 
-* npm start - to run it application
-* Waiting a minute or so is essential for task 2 (3D map) to load.
-
+#### Installation Processs 
+```
+git clone https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-main.git
+npm install
+npm start
+```

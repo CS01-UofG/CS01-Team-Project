@@ -1,7 +1,5 @@
-#ThalesArc
-The latest application which replaces the previously maintained CesiumJS contained within ElectronJS.
-
-What this application can do currently?  
+# ThalesArc
+This application hosts the 3D concept and works in accordance with the [ThalesArcSimulationScript](https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-main/-/tree/master/ThalesArcSimulationScript) which also replaces the previously maintained CesiumJS based application contained within ElectronJS.. It is based on the JavaFX API which enables us to cross-platform desktop applications with the added support of ArcGIS Java SDK which powers the map provided in the application. 
 
 ## Instructions
 
@@ -24,7 +22,7 @@ What this application can do currently?
 6. Right-click the project in the Project Explorer or Package Explorer and choose _Run As > Maven Build..._. In the _Edit Configuration_ dialog, create a new configuration with name `unpack`. In the _Goals_ field, enter `dependency:unpack`. Click _Run_ to run the goal. This will unpack the native libraries into $USER_HOME/.arcgis.
 7. Again, create a new run configuration with name `run`. In the _Goals_ field, enter `compile exec:java`. Click _Run_ to run the goal. The app should compile and launch the JavaFX window.
 
-### Command Line - Linux (Windows and Mac unsure look at above instructions)
+### Command Line - Linux 
 1. Make sure Maven and Java has been installed previously and in path
 2. Run `mvn dependency:unpack`
 3. Run `mvn compile exec:java` 
