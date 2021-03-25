@@ -1,17 +1,15 @@
-package test;
+package Tests;
 
+import com.sun.javafx.application.PlatformImpl;
 import cs01.ComponentFactory;
 import javafx.scene.control.Slider;
-
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sun.javafx.application.PlatformImpl;
+import static org.junit.Assert.*;
 
 
-public class SliderTest  {
+public class SliderTests {
 	private ComponentFactory componentFactory = new ComponentFactory();
 	
     @BeforeClass
@@ -23,8 +21,8 @@ public class SliderTest  {
 	@Test
 	public void shouldNotBeNull() {
 		var slider = componentFactory.createSlider(0, 360, 40, 20, 5, 1);
-		
-		assertFalse(slider == null);
+
+		assertNotNull(slider);
 	}
 	
 	@Test
@@ -38,12 +36,12 @@ public class SliderTest  {
 		correctSlider.setMajorTickUnit(20);
 		correctSlider.setMinorTickCount(5);
 		correctSlider.setBlockIncrement(1);
-        
-		assertTrue(slider.getMin() == correctSlider.getMin());
-		assertTrue(slider.getMax() == correctSlider.getMax());
-		assertTrue(slider.getValue() == correctSlider.getValue());
-		assertTrue(slider.getMajorTickUnit() == correctSlider.getMajorTickUnit());
-		assertTrue(slider.getMinorTickCount() == correctSlider.getMinorTickCount());
-		assertTrue(slider.getBlockIncrement() == correctSlider.getBlockIncrement());
+
+		assertEquals(slider.getMin(), correctSlider.getMin(), 0.0);
+		assertEquals(slider.getMax(), correctSlider.getMax(), 0.0);
+		assertEquals(slider.getValue(), correctSlider.getValue(), 0.0);
+		assertEquals(slider.getMajorTickUnit(), correctSlider.getMajorTickUnit(), 0.0);
+		assertEquals(slider.getMinorTickCount(), correctSlider.getMinorTickCount());
+		assertEquals(slider.getBlockIncrement(), correctSlider.getBlockIncrement(), 0.0);
 	}
 }

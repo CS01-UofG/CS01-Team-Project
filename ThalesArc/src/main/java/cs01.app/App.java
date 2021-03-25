@@ -69,10 +69,7 @@ public class App extends Application {
     public ListView<Text> pointVisualList = new ListView<Text>();
     public VBox leftBox2 = new VBox(pointVisualList);
 
-    private ToggleButton FOVToggle;
     private ToggleButton polylinesToggle;
-    private ToggleButton visibilityToggle;
-    private ToggleButton frustumToggle;
 
     private Button createPolylines;
     private Button openFileButton;
@@ -267,13 +264,10 @@ public class App extends Application {
 
         });
 
-        Label FOV = new Label("Show Field Of View");
-        FOVToggle = new ToggleButton("Show FOV");
+
         Label Polylines = new Label("Show Polylines");
         polylinesToggle = new ToggleButton("Show Polylines");
-        Label Viewshed1 = new Label("Viewshed Visibility");
-        visibilityToggle = new ToggleButton("visibilityToggle");
-        frustumToggle = new ToggleButton("frustumToggle");
+
 
         // create a button to update the view
         cameraButton = new Button("Update camera");
@@ -289,15 +283,12 @@ public class App extends Application {
             }
         );
 
-        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle, FOV, FOVToggle ,Viewshed1, visibilityToggle ,frustumToggle);
+        leftBox.getChildren().addAll(Polylines, createPolylines, polylinesToggle);
         centre.getChildren().addAll(sceneView, cameraButton);
         StackPane.setAlignment(cameraButton, Pos.TOP_LEFT);
 
         polylinesToggle.selectedProperty().addListener(e -> polygonLayer.setVisible(polylinesToggle.isSelected()) );
         polylinesToggle.textProperty().bind(Bindings.createStringBinding(() -> polylinesToggle.isSelected() ? "ON" : "OFF", polylinesToggle.selectedProperty()));
-
-        FOVToggle.selectedProperty().addListener(e -> FOVToggle.setVisible(!FOVToggle.isSelected()) );
-        FOVToggle.textProperty().bind(Bindings.createStringBinding(() -> FOVToggle.isSelected() ? "ON" : "OFF", FOVToggle.selectedProperty()));
 
         SplitPane mainSplit = new SplitPane();
         leftBox.getChildren().add( leftBox2);
@@ -335,7 +326,7 @@ public class App extends Application {
      * @param lon2
      * @return
      */
-    public double distance(double lat1, double lon1, double lat2, double lon2) {
+    public static double distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return 0;
         }
@@ -519,7 +510,7 @@ public class App extends Application {
      * @param data string
      * @return JSON object
      */
-    public Sensor convertJSON(String data){
+    public static Sensor convertJSON(String data){
         return JSON.parseObject(data,Sensor.class);
     }
 

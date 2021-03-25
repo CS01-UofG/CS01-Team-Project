@@ -1,21 +1,18 @@
-default:
-  # This template uses jdk8 for verifying and deploying images
-  image: maven:3.6.3-jdk-11
+# This template uses jdk8 for verifying and deploying images
 
-  before_script:
-    - echo "Test pipeline" 
-  
+image: maven:3.6.3-jdk-11
+
 cache:
   paths:
-  - ThalesArc/
+    - ThalesArc/
+    - target/
 
-test-job:
+test:
   tags:
     - docker
-  before_script: 
-    - dir
-    - cd ThalesArc
-    - echo "Should do things"
-    - mvn dependency:unpack
+  stage: test
   script:
+    - cd ThalesArc
+    - mvn dependency:unpack
     - mvn test
+

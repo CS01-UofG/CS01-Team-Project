@@ -24,13 +24,8 @@
   <component name="ChangeListManager">
     <list default="true" id="cb927452-3035-4750-88bc-5a70d5477bd7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log1.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log2.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log3.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log4.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log5.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/JSONLogs/log6.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs01.app/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/cs01.app/JSONTests.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +42,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/.." value="Feature_Simulation_Script" />
+        <entry key="$PROJECT_DIR$/.." value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -70,16 +65,97 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Problems" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\krish\UniversityYear3\Professional Software Development\gitlab_main_repo\cs01-main\ThalesArc\src\test\java\cs01" />
+      <recent name="D:\Users\krish\UniversityYear3\Professional Software Development\gitlab_main_repo\cs01-main\ThalesArc\src\test\java" />
+      <recent name="D:\Users\krish\UniversityYear3\Professional Software Development\gitlab_main_repo\cs01-main\ThalesArc\src\test" />
+    </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="cs01.app" />
     </key>
+  </component>
+  <component name="RunManager" selected="JUnit.SliderTests (1)">
+    <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="cs01.app.App" />
+      <module name="ThalesArc" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="cs01.app.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in ThalesArc" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ThalesArc" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SliderTests (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ThalesArc" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="Tests" />
+      <option name="MAIN_CLASS_NAME" value="Tests.SliderTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SliderTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ThalesArc" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="cs01.app.Tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="cs01.app.Tests" />
+      <option name="MAIN_CLASS_NAME" value="cs01.app.Tests.SliderTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tests in ThalesArc" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ThalesArc" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="Tests" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.SliderTests (1)" />
+        <item itemvalue="JUnit.SliderTests" />
+        <item itemvalue="JUnit.All in ThalesArc" />
+        <item itemvalue="JUnit.Tests in ThalesArc" />
+        <item itemvalue="Application.App" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -105,6 +181,14 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="440" y="98" key="#Project_Structure" timestamp="1616708625643">
+      <screen x="0" y="0" width="1920" height="1048" />
+    </state>
+    <state x="440" y="98" key="#Project_Structure/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616708625643" />
+    <state x="414" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1616609750484">
+      <screen x="0" y="0" width="1920" height="1048" />
+    </state>
+    <state x="414" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616609750484" />
     <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1614435910589">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
@@ -125,29 +209,29 @@
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state x="740" y="241" key="FileChooserDialogImpl/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1614433868194" />
-    <state width="1877" height="215" key="GridCell.Tab.0.bottom" timestamp="1615610108958">
+    <state width="1877" height="347" key="GridCell.Tab.0.bottom" timestamp="1616710190403">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state width="1877" height="195" key="GridCell.Tab.0.bottom/-1920.1.1920.1048/0.0.1920.1048@-1920.1.1920.1048" timestamp="1614474405462" />
-    <state width="1877" height="215" key="GridCell.Tab.0.bottom/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1615610108958" />
+    <state width="1877" height="347" key="GridCell.Tab.0.bottom/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616710190403" />
     <state width="1044" height="215" key="GridCell.Tab.0.bottom/0.0.1920.1048@0.0.1920.1048" timestamp="1615434697256" />
-    <state width="1877" height="215" key="GridCell.Tab.0.center" timestamp="1615610108958">
+    <state width="1877" height="347" key="GridCell.Tab.0.center" timestamp="1616710190403">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state width="1877" height="195" key="GridCell.Tab.0.center/-1920.1.1920.1048/0.0.1920.1048@-1920.1.1920.1048" timestamp="1614474405462" />
-    <state width="1877" height="215" key="GridCell.Tab.0.center/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1615610108958" />
+    <state width="1877" height="347" key="GridCell.Tab.0.center/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616710190403" />
     <state width="1044" height="215" key="GridCell.Tab.0.center/0.0.1920.1048@0.0.1920.1048" timestamp="1615434697256" />
-    <state width="1877" height="215" key="GridCell.Tab.0.left" timestamp="1615610108958">
+    <state width="1877" height="347" key="GridCell.Tab.0.left" timestamp="1616710190403">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state width="1877" height="195" key="GridCell.Tab.0.left/-1920.1.1920.1048/0.0.1920.1048@-1920.1.1920.1048" timestamp="1614474405462" />
-    <state width="1877" height="215" key="GridCell.Tab.0.left/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1615610108958" />
+    <state width="1877" height="347" key="GridCell.Tab.0.left/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616710190403" />
     <state width="1044" height="215" key="GridCell.Tab.0.left/0.0.1920.1048@0.0.1920.1048" timestamp="1615434697255" />
-    <state width="1877" height="215" key="GridCell.Tab.0.right" timestamp="1615610108958">
+    <state width="1877" height="347" key="GridCell.Tab.0.right" timestamp="1616710190403">
       <screen x="0" y="0" width="1920" height="1048" />
     </state>
     <state width="1877" height="195" key="GridCell.Tab.0.right/-1920.1.1920.1048/0.0.1920.1048@-1920.1.1920.1048" timestamp="1614474405462" />
-    <state width="1877" height="215" key="GridCell.Tab.0.right/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1615610108958" />
+    <state width="1877" height="347" key="GridCell.Tab.0.right/-1920.1.1920.1048/0.0.1920.1048@0.0.1920.1048" timestamp="1616710190403" />
     <state width="1044" height="215" key="GridCell.Tab.0.right/0.0.1920.1048@0.0.1920.1048" timestamp="1615434697256" />
     <state x="-1430" y="180" key="Maven.ArtifactSearchDialog" timestamp="1614431322424">
       <screen x="-1920" y="1" width="1920" height="1048" />
