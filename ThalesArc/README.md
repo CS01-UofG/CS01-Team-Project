@@ -1,6 +1,10 @@
 # ThalesArc
 This application hosts the 3D concept and works in accordance with the [ThalesArcSimulationScript](https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-main/-/tree/master/ThalesArcSimulationScript) which also replaces the previously maintained CesiumJS based application contained within ElectronJS.. It is based on the JavaFX API which enables us to cross-platform desktop applications with the added support of ArcGIS Java SDK which powers the map provided in the application. 
 
+## Sample Logs 
+Sample JSON logs can be opened up from the JSONLogs directory to test the application.
+ 
+
 ## Instructions
 
 ### IntelliJ IDEA
