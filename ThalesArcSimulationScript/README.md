@@ -5,4 +5,8 @@
 ```sh
 pip install -r requirements.txt
 ```
-3. Use
+3. Run the script 
+```
+python / python3 define_route.py
+```
+4. This opens up a tkinter interface which allows you to run the application when the ThalesArc application is running.
