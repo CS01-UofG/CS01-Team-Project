@@ -6,12 +6,12 @@ import static org.junit.Assert.assertEquals;
 
 public class JSONTests {
 
-    String data = "{\"id\": 29, \"sensor_latitude\": -4.4892047, " +
+    public String data = "{\"id\": 29, \"sensor_latitude\": -4.4892047, " +
             "\"sensor_longitude\": 48.397533, \"sensor_altitude\": 90," +
             " \"sensor_azimuth\": -58.511074478830814, \"sensor_elevation\": 74, " +
             "\"target_latitude\": -4.4895891778112125, \"target_longitude\": 48.39802252713922, " +
             "\"target_altitude\": 109, \"target_range\": 100, \"target_description\": \"\"}";
-    Sensor sensorObj = App.convertJSON(data);
+    public Sensor sensorObj = App.convertJSON(data);
 
     @Test
     public void shouldNotBeNull() {
