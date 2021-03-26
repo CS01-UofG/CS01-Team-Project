@@ -510,7 +510,7 @@ public class App extends Application {
      * @param data string
      * @return JSON object
      */
-    public static Sensor convertJSON(String data){
+    static Sensor convertJSON(String data){
         return JSON.parseObject(data,Sensor.class);
     }
 
@@ -615,12 +615,14 @@ public class App extends Application {
     /**
      * Updates user location at the text bar
      */
-    public void updateUserText(){
+    void updateUserText(){
     	String userText = getUserText(user.getX(), user.getY(), user.getZ());
     	userTextField.setText(userText);
     }
-    
-    public static String getUserText(double x, double y, double z) {
+    /*
+    * Returns required string for user text
+     */
+    static String getUserText(double x, double y, double z) {
     	return "x: " + x + " y: " + y + " z: " + z;
     }
 
