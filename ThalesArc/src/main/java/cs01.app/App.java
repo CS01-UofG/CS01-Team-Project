@@ -146,7 +146,7 @@ public class App extends Application {
         // create a view and set map to it
         MapView mapView = new MapView();
         mapView.setMap(map);
-
+        
         sceneView.addSpatialReferenceChangedListener(src -> throwConfirmationAlert("Scene Loaded in"));
 
         // Hardcoded to Brest France
@@ -616,7 +616,12 @@ public class App extends Application {
      * Updates user location at the text bar
      */
     public void updateUserText(){
-        userTextField.setText("x: " + user.getX() + " y: " +user.getY() + " z: " + user.getZ());
+    	String userText = getUserText(user.getX(), user.getY(), user.getZ());
+    	userTextField.setText(userText);
+    }
+    
+    public static String getUserText(double x, double y, double z) {
+    	return "x: " + x + " y: " + y + " z: " + z;
     }
 
     /**
