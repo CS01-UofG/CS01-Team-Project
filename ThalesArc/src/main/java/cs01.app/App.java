@@ -510,7 +510,7 @@ public class App extends Application {
      * @param data string
      * @return JSON object
      */
-    public static Sensor convertJSON(String data){
+    static Sensor convertJSON(String data){
         return JSON.parseObject(data,Sensor.class);
     }
 
