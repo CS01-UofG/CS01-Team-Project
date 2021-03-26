@@ -615,11 +615,13 @@ public class App extends Application {
     /**
      * Updates user location at the text bar
      */
-    public void updateUserText(){
+    void updateUserText(){
     	String userText = getUserText(user.getX(), user.getY(), user.getZ());
     	userTextField.setText(userText);
     }
-    
+    /*
+    * Returns required string for user text
+     */
     static String getUserText(double x, double y, double z) {
     	return "x: " + x + " y: " + y + " z: " + z;
     }
