@@ -147,8 +147,6 @@ public class App extends Application {
         MapView mapView = new MapView();
         mapView.setMap(map);
         
-        System.out.println(cs01.app.App.distance(25.299819047685062, 55.37830597919699, 27.299819047685062, 57.37830597919699));
-
         sceneView.addSpatialReferenceChangedListener(src -> throwConfirmationAlert("Scene Loaded in"));
 
         // Hardcoded to Brest France
