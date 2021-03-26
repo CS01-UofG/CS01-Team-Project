@@ -620,7 +620,7 @@ public class App extends Application {
     	userTextField.setText(userText);
     }
     
-    public static String getUserText(double x, double y, double z) {
+    static String getUserText(double x, double y, double z) {
     	return "x: " + x + " y: " + y + " z: " + z;
     }
 
