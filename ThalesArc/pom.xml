@@ -87,6 +87,7 @@
             <configuration>
                 <excludes>
                     <exclude>**/*SliderTests.java</exclude>
+                    <exclude>**/*OutputTests.java</exclude>
                 </excludes>
             </configuration>
         </plugin>
