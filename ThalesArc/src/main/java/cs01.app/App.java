@@ -326,7 +326,7 @@ public class App extends Application {
      * @param lon2
      * @return
      */
-    public static double distance(double lat1, double lon1, double lat2, double lon2) {
+    static double distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return 0;
         }
