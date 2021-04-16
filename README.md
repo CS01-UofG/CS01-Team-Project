@@ -13,6 +13,6 @@ Autonomous systems live in the real world and need to understand the real worldÂ
 - This directory hosts the 3D concept and works in accordance to the [ThalesArcSimulationScript](https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-main/-/tree/master/ThalesArcSimulationScript). It is based on the JavaFX API which enables us to cross-platform desktop applications with the added support of ArcGIS Java SDK which powers the map provided in the application. 
   
 
-## [Dissertation](https://stgit.dcs.gla.ac.uk/tp3-2020-CS01/cs01-dissertation/-/blob/master/template/dissertation.pdf)
-- Team CS01's dissertation can be found at this repository. The dissertation presents a case study of the development of a sensors mapping system. The  application takes data from a handheld sensor  system like the SOPHIE LITE Electrical External ICD device, and represents point of interests on the application map.
+## [Dissertation]
+- Team CS01's dissertation can be found at this repository (private). The dissertation presents a case study of the development of a sensors mapping system. The  application takes data from a handheld sensor  system like the SOPHIE LITE Electrical External ICD device, and represents point of interests on the application map.
 
